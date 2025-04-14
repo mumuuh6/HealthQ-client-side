@@ -299,7 +299,7 @@ export default function ContactPage() {
                                                 +8801963175097
                                             </a>
                                             <p className="text-sm  mt-2">Technical Support</p>
-                                            <a href="tel:+18009876543" className="text-primary hover:underline">
+                                            <a href="tel:+01963175097" className="text-primary hover:underline">
                                                 +8801963175097
                                             </a>
                                         </div>
