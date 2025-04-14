@@ -35,8 +35,8 @@ export default function LoginPage() {
       confirmButtonColor: "hsl(var(--primary))",
     }).then(() => {
       // Redirect based on user type (in a real app, this would come from your auth system)
-      const userType = "patient" // Example, would come from auth response
-      if (userType === "doctor") {
+      const userType: "doctor" | "patient" = "patient" // Example, would come from auth response
+      if (userType) {
         router.push("/doctor/dashboard")
       } else {
         router.push("/patient/dashboard")
