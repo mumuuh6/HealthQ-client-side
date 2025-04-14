@@ -6,10 +6,8 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Clock, Menu, Bell } from "lucide-react"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Calendar, Clock } from "lucide-react"
 
 // Mock data for appointments
 const upcomingAppointments = [
@@ -117,7 +115,7 @@ export default function PatientDashboard() {
                       <Clock className="h-6 w-6 " />
                     </div>
                     <h3 className="font-medium mb-1">No Active Queue</h3>
-                    <p className="text-sm  mb-4">You're not currently in any queue</p>
+                    <p className="text-sm  mb-4">You&apos;re not currently in any queue</p>
                     <Button asChild>
                       <Link href="/patient/appointments">View Your Appointments</Link>
                     </Button>

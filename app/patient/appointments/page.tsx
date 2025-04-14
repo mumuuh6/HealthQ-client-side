@@ -5,10 +5,9 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Clock, Menu, Bell, Plus, ChevronRight, Filter } from "lucide-react"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Calendar,  Plus, ChevronRight, Filter } from "lucide-react"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { format } from "date-fns"
@@ -235,7 +234,7 @@ export default function PatientAppointmentsPage() {
                         </div>
                         <h3 className="font-medium mb-1">No Appointments</h3>
                         <p className="text-sm  mb-4">
-                          You don't have any {activeTab} appointments
+                          You don&apos;t have any {activeTab} appointments
                         </p>
                         <Button asChild size="sm">
                           <Link href="/patient/book-appointment">Book an Appointment</Link>

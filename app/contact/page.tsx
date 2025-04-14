@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Clock, Mail, Phone, MapPin, HelpCircle } from "lucide-react"
+import {  Mail, Phone, MapPin, HelpCircle } from "lucide-react"
 
 type ContactFormValues = {
     name: string
@@ -67,7 +67,7 @@ export default function ContactPage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5, delay: 0.2 }}
                         >
-                            Have questions or need assistance? We're here to help you.
+                            Have questions or need assistance? We&apos;re here to help you.
                         </motion.p>
                     </div>
 
@@ -82,7 +82,7 @@ export default function ContactPage() {
                                 <CardHeader>
                                     <CardTitle>Send Us a Message</CardTitle>
                                     <CardDescription>
-                                        Fill out the form below and we'll get back to you as soon as possible.
+                                        Fill out the form below and we&apos;ll get back to you as soon as possible.
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent >
@@ -339,7 +339,7 @@ export default function ContactPage() {
                                         How do I book an appointment?
                                     </h3>
                                     <p className="text-sm  pl-6">
-                                        You can book an appointment by logging into your account and navigating to the "Book Appointment"
+                                        You can book an appointment by logging into your account and navigating to the &apos;Book Appointment&apos;
                                         section. Follow the prompts to select a doctor, date, and time.
                                     </p>
                                 </div>
@@ -351,7 +351,7 @@ export default function ContactPage() {
                                     </h3>
                                     <p className="text-sm  pl-6">
                                         On the day of your appointment, log in to your account and navigate to your upcoming appointments.
-                                        Click on "Join Queue" for the relevant appointment.
+                                        Click on &apos;Join Queue&apos; for the relevant appointment.
                                     </p>
                                 </div>
 

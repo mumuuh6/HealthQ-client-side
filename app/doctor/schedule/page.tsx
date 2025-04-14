@@ -2,13 +2,13 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import Link from "next/link"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+
 import { Badge } from "@/components/ui/badge"
-import { CalendarIcon, Clock, Menu, Bell, ChevronLeft, ChevronRight, Plus } from "lucide-react"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { CalendarIcon,  ChevronLeft, ChevronRight, Plus } from "lucide-react"
+
 import { Calendar } from "@/components/ui/calendar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -239,7 +239,7 @@ export default function DoctorSchedulePage() {
                               </div>
                               <h3 className="font-medium mb-1">No Appointments</h3>
                               <p className="text-sm  mb-4">
-                                You don't have any appointments scheduled for this day
+                                You don&apos;t have any appointments scheduled for this day
                               </p>
                               <Button size="sm">
                                 <Plus className="mr-2 h-4 w-4" />

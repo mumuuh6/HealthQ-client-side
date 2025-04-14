@@ -2,15 +2,15 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import Link from "next/link"
+
 import Swal from "sweetalert2"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Clock, Menu, Bell, UserCheck, UserX, ChevronRight, Users } from "lucide-react"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Calendar, Clock, UserCheck, UserX, ChevronRight, Users } from "lucide-react"
+
 
 // Mock data for queue and appointments
 const queuePatients = [
@@ -213,7 +213,7 @@ export default function DoctorDashboard() {
                         <Clock className="h-6 w-6 " />
                       </div>
                       <h3 className="font-medium mb-1">No Active Patient</h3>
-                      <p className="text-sm  mb-4">You're not currently seeing any patient</p>
+                      <p className="text-sm  mb-4">You&apos;re not currently seeing any patient</p>
                       <Button>Call Next Patient</Button>
                     </div>
                   )}
