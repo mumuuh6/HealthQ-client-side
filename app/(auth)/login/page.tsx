@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import UseAxiosNormal from "@/app/Instances/page"
+import { toast } from "react-toastify"
+import { signIn } from "next-auth/react"
 
 type LoginFormValues = {
   email: string
@@ -15,7 +18,7 @@ type LoginFormValues = {
 
 export default function LoginPage() {
   const router = useRouter()
-
+const axiosInstanceNormal=UseAxiosNormal()
   const loginForm = useForm<LoginFormValues>({
     defaultValues: {
       email: "",
@@ -23,25 +26,57 @@ export default function LoginPage() {
     },
   })
 
-  const onLoginSubmit = (data: LoginFormValues) => {
-    // In a real app, you would authenticate with your backend here
-    console.log("Login data:", data)
-
-    // Show success message
-    Swal.fire({
-      title: "Success!",
-      text: "You have been logged in successfully.",
-      icon: "success",
-      confirmButtonColor: "hsl(var(--primary))",
-    }).then(() => {
-      // Redirect based on user type (in a real app, this would come from your auth system)
-      const userType: "doctor" | "patient" = "patient" // Example, would come from auth response
-      if (userType) {
-        router.push("/doctor/dashboard")
-      } else {
-        router.push("/patient/dashboard")
+const handlecredentialsLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+  console.log('l')
+    const form = (e.target as HTMLButtonElement).closest("form")
+    if (form) {
+      const formData = new FormData(form)
+      // Collecting all form data
+      const data = {
+        email: formData.get("email") as string,
+        password: formData.get("password") as string,
       }
-    })
+      
+      if (!data.email || !data.password) {
+        Swal.fire({
+          title: "Error",
+          text: "Please fill in all required fields.",
+          icon: "error",
+        })
+        return
+      }
+      const userInformation={
+        email:data.email,
+        password:data.password,
+        lastLoginTime:new Date().toISOString(),
+      }
+      try{
+        const response =await axiosInstanceNormal.post(`/signin/${data?.email}`,userInformation)
+      if (response?.data?.status && response.data.userInfo) {
+        const userInfo = response.data.userInfo;
+        console.log("User info:", userInfo);
+        //manually sign the user in nextauth
+        await signIn("credentials", {
+          email: userInfo.email,
+          password: userInfo.password,
+          redirect: false,
+        });
+        // Redirect to the home page or any other page after successful sign-in
+        toast.success(`${response.data.message}`);
+      } else if (!response?.data?.status) {
+        toast.error(`${response.data.message}`);
+      }
+      }
+      catch(error){
+        console.error("Error during login:", error)
+        Swal.fire({
+          title: "Error",
+          text: "An error occurred during login.",
+          icon: "error",
+        })
+      }
+    }
   }
 
   return (
@@ -50,7 +85,7 @@ export default function LoginPage() {
         <CardTitle>Login</CardTitle>
         <CardDescription>Enter your credentials to access your account</CardDescription>
       </CardHeader>
-      <form onSubmit={loginForm.handleSubmit(onLoginSubmit)}>
+      <form>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -94,7 +129,10 @@ export default function LoginPage() {
           </div>
         </CardContent>
         <CardFooter className="mt-3">
-          <Button type="submit" className="w-full">
+          <Button 
+          onClick={handlecredentialsLogin}
+          type="submit" 
+          className="w-full">
             Login
           </Button>
         </CardFooter>

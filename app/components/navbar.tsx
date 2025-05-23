@@ -8,11 +8,27 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Clock, Menu, X } from "lucide-react"
 import { ThemeToggle } from "@/app/components/theme-toggle"
+import { useSession } from "next-auth/react"
+import UseAxiosNormal from "../Instances/page"
 
 export function Navbar() {
   const pathname = usePathname()
+  const session=useSession()
+  console.log("from",session)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-
+  const [role,setrole]=useState('');
+  const axiosinstance=UseAxiosNormal();
+  const fetchUserRole = async () => {
+    try {
+      const response = await axiosinstance.get(`/find/role/${session?.data?.user?.email}`);
+      console.log("response",response.data.role)
+      setrole(response.data.role);
+    } catch (error) {
+      console.error('Error fetching user role:', error);
+    }
+  };
+  fetchUserRole();
+  console.log("role",role)
   // Define navigation items
   const navItems = [
     { name: "Home", href: "/" },
@@ -20,6 +36,11 @@ export function Navbar() {
     // { name: "How It Works", href: "/#how-it-works" },
     { name: "Contact", href: "/contact" },
     { name: "About Us", href: "/about" },
+    {
+      name: "Dashboard",
+      href: role === "doctor" ? "/doctor/dashboard" : "/patient/dashboard"
+    }
+    
     
   ]
 

@@ -6,6 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import React from "react"
+import { toast } from "react-toastify";
+import { Hand } from "lucide-react"
+import UseAxiosNormal from "@/app/Instances/page"
 
 type RegisterFormValues = {
   name: string
@@ -27,33 +31,90 @@ export default function RegisterPage() {
       userType: "patient",
     },
   })
-
-  const onRegisterSubmit = (data: RegisterFormValues) => {
-    // In a real app, you would register the user with your backend here
-    console.log("Register data:", data)
-
-    // Validate passwords match
-    if (data.password !== data.confirmPassword) {
-      Swal.fire({
-        title: "Error!",
-        text: "Passwords do not match.",
-        icon: "error",
-        confirmButtonColor: "hsl(var(--primary))",
-      })
-      return
+const axiosInstanceNormal=UseAxiosNormal()
+  const handleSignUp =async (e:React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+  console.log('l')
+    const form = (e.target as HTMLButtonElement).closest("form")
+    if (form) {
+      const formData = new FormData(form)
+      // Collecting all form data
+      const data = {
+        name: formData.get("name") as string,
+        email: formData.get("email") as string,
+        password: formData.get("password") as string,
+        confirmPassword: formData.get("confirmPassword") as string,
+        userType: formData.get("userType") as string,
+      }
+      console.log("Form Data:", data)
+      if (!data.name || !data.email || !data.password || !data.confirmPassword) {
+        toast.error("Please fill in all required fields.");
+        }
+      if (data.password.length < 6) {
+        toast.error("Password should be at least 6 characters.");
+        return;
+      }
+      if (!/[A-Z]/.test(data.password)) {
+        toast.error("Password must contain at least one uppercase letter.");
+        return;
+      }
+      if (!/[a-z]/.test(data.password)) {
+        toast.error("Password must contain at least one lowercase letter.");
+        return;
+      }
+      if (!/[0-9]/.test(data.password)) {
+        toast.error("Password must contain at least one number.");
+        return;
+      }
+      if (!/[!@#$%^&*(),.?":{}|<>]/.test(data.password)) {
+        toast.error("Password must contain at least one special character (!@#$%^&* etc.).");
+        return;
+      }
+      if (data.password !== data.confirmPassword) {
+        toast.error("Passwords do not match.");
+        return;
+      }
+const userData={
+  name: data.name,
+  email: data.email,
+  password: data.password,
+  userType: data.userType,
+  lastLoginTime:new Date().toISOString(),
+  createdAt: new Date().toISOString(),
+}
+console.log("User Data:", userData)
+    try{
+      const response =await axiosInstanceNormal.post("signup",userData);
+      if(response?.data?.status){
+        Swal.fire({
+          title: "Success!",
+          text: "You have been registered successfully.",
+          icon: "success",
+          confirmButtonColor: "hsl(var(--primary))",
+        }).then(() => {
+          // Redirect based on user type (in a real app, this would come from your auth system)
+          if (data.userType === "doctor") {
+            router.push("/doctor/dashboard")
+          } else {
+            router.push("/patient/dashboard")
+          }
+        })
+      }
+      else if(!response?.data?.status){
+        Swal.fire({
+          title: "Error!",
+          text: response?.data?.message,
+          icon: "error",
+          confirmButtonColor: "hsl(var(--primary))",
+        })
+      }
+      console.log("Response from server:", response)
     }
-
-    // Show success message
-    Swal.fire({
-      title: "Success!",
-      text: "Your account has been created successfully.",
-      icon: "success",
-      confirmButtonColor: "hsl(var(--primary))",
-    }).then(() => {
-      // Redirect to login page
-      router.push("/login")
-    })
-  }
+    catch(error){
+      console.error("Error Signing Up:",error)
+    }
+    
+    }}
 
   return (
     <Card>
@@ -61,7 +122,7 @@ export default function RegisterPage() {
         <CardTitle>Create an account</CardTitle>
         <CardDescription>Enter your information to create an account</CardDescription>
       </CardHeader>
-      <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)}>
+      <form>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Full Name</Label>
@@ -138,7 +199,10 @@ export default function RegisterPage() {
           </div>
         </CardContent>
         <CardFooter className="mt-3">
-          <Button type="submit" className="w-full">
+          <Button 
+          onClick={handleSignUp}
+          type="submit" 
+          className="w-full">
             Create account
           </Button>
         </CardFooter>

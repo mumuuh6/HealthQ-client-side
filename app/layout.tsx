@@ -5,7 +5,8 @@ import "./globals.css"
 import { ThemeProvider } from "@/app/components/theme-provider"
 import { Navbar } from "@/app/components/navbar"
 import { Footer } from "@/app/components/footer"
-
+import NextAuthSessionProvider from "@/Providers/NextAuthSessionProvider"
+import QueryProvider from "./providers/QueryProvider";
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
@@ -20,9 +21,12 @@ export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
-}>) {
+}>)
+ {
   return (
     <html lang="en" suppressHydrationWarning>
+      <NextAuthSessionProvider>
+      <QueryProvider>
       <body className={inter.className} cz-shortcut-listen="true">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <div className="flex min-h-screen flex-col">
@@ -32,6 +36,8 @@ export default function RootLayout({
           </div>
         </ThemeProvider>
       </body>
+      </QueryProvider>
+      </NextAuthSessionProvider>
     </html>
   )
 }

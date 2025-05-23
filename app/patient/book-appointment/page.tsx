@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { use, useState } from "react"
 import { useForm } from "react-hook-form"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
@@ -13,7 +13,8 @@ import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
 import {  ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
-
+import UseAxiosNormal from "@/app/Instances/page"
+import axios from "axios"
 // Mock data for doctors and time slots
 const doctors = [
   { id: 1, name: "Dr. Sarah Johnson", specialty: "Cardiologist", availableDays: [1, 3, 5] },
@@ -21,6 +22,7 @@ const doctors = [
   { id: 3, name: "Dr. Emily Wilson", specialty: "General Practitioner", availableDays: [1, 2, 3, 4, 5] },
   { id: 4, name: "Dr. James Rodriguez", specialty: "Orthopedic Surgeon", availableDays: [1, 3, 5] },
 ]
+
 
 const timeSlots = [
   { id: 1, time: "9:00 AM" },
@@ -51,7 +53,7 @@ export default function BookAppointmentPage() {
   const [selectedDoctor, setSelectedDoctor] = useState<number | null>(null)
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<number | null>(null)
-
+  const axiossecure=UseAxiosNormal();
   const form = useForm<AppointmentFormValues>({
     defaultValues: {
       doctorId: 0,
@@ -86,10 +88,11 @@ export default function BookAppointmentPage() {
     }
   }
 
-  const onSubmit = (data: AppointmentFormValues) => {
+  const onSubmit = async(data: AppointmentFormValues) => {
     // In a real app, you would submit the appointment data to your backend here
     console.log("Appointment data:", data)
-
+    const res=await axiossecure.post('/book-appointment', data);
+    if(res?.data?.data?.insertedId){
     // Show success message
     Swal.fire({
       title: "Appointment Booked!",
@@ -99,6 +102,8 @@ export default function BookAppointmentPage() {
     }).then(() => {
       router.push("/patient/dashboard")
     })
+    }
+
   }
 
   const selectedDoctorData = doctors.find((doctor) => doctor.id === selectedDoctor)
