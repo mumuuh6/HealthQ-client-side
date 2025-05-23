@@ -4,7 +4,7 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Calendar, Clock, Users, User, CheckCircle } from "lucide-react"
-
+import Image from "next/image";
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
@@ -56,10 +56,14 @@ export default function Home() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
               >
-                <img
+                
+                
+                <Image
                   alt="Queue Management Dashboard"
                   className="aspect-video overflow-hidden rounded-xl object-cover object-center"
-                  src="/placeholder.svg?height=550&width=800"
+                  src="/square-activity.png"
+                  width={250}
+                  height={50}
                 />
               </motion.div>
             </div>

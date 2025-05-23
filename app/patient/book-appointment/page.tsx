@@ -1,6 +1,6 @@
 "use client"
 
-import { use, useState } from "react"
+import {  useState } from "react"
 import { useForm } from "react-hook-form"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
@@ -14,7 +14,7 @@ import { format } from "date-fns"
 import {  ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import UseAxiosNormal from "@/app/Instances/page"
-import axios from "axios"
+
 // Mock data for doctors and time slots
 const doctors = [
   { id: 1, name: "Dr. Sarah Johnson", specialty: "Cardiologist", availableDays: [1, 3, 5] },

@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import React from "react"
 import { toast } from "react-toastify";
-import { Hand } from "lucide-react"
+
 import UseAxiosNormal from "@/app/Instances/page"
 
 type RegisterFormValues = {
