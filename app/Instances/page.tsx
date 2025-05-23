@@ -28,20 +28,33 @@ const UseAxiosNormal=()=>{
                 });
                 // Navigate to login page
                 redirect("/auth/signin");
-              } catch (logoutError) {
+              } 
+              catch (logoutError) {
                 console.error("Logout error:", logoutError);
-                const errorCode =
-                  logoutError.code?.split("auth/")[1] || "unknown-error";
+              
+                let errorCode = "unknown-error";
+              
+                if (
+                  logoutError &&
+                  typeof logoutError === "object" &&
+                  "code" in logoutError &&
+                  typeof (logoutError as any).code === "string"
+                ) {
+                  errorCode = (logoutError as { code: string }).code.split("auth/")[1] || "unknown-error";
+                }
+              
                 const formattedError = errorCode
                   .split("-")
                   .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
                   .join(" ");
+              
                 Swal.fire({
-                    title: "Error",
-                    text: formattedError,
-                    icon: "error",
-                })
+                  title: "Error",
+                  text: formattedError,
+                  icon: "error",
+                });
               }
+              
             }
     
             return Promise.reject(error);
