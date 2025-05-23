@@ -12,8 +12,11 @@ const authOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
+        if (!credentials || !credentials.email) {
+          throw new Error("Missing credentials");
+        }
         // Fetch user by email
-        const res = await axios.get(`https://quiz-mania-iota.vercel.app/signin/${credentials.email}`);
+        const res = await axios.get(`https://health-q-tau.vercel.app/signin/${credentials?.email}`);
         const user = res.data.userInfo;
 
         if (user) {
