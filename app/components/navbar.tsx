@@ -39,7 +39,8 @@ export function Navbar() {
     {
       name: "Dashboard",
       href: role === "doctor" ? "/doctor/dashboard" : "/patient/dashboard"
-    }
+    },
+    { name: "Melanoma Screening", href: "/melanoma-screening" },
     
     
   ]

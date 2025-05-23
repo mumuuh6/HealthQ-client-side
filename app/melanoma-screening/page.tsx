@@ -104,7 +104,7 @@ export default function MelanomaScreeningPage() {
               <CardHeader>
                 <CardTitle>Upload Skin Image</CardTitle>
                 <CardDescription>
-                  Please upload a clear, well-lit image of the skin lesion you're concerned about.
+                  Please upload a clear, well-lit image of the skin lesion you are concerned about.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -244,7 +244,7 @@ export default function MelanomaScreeningPage() {
                     </div>
                     <p className="font-medium">No Analysis Yet</p>
                     <p className="text-sm text-muted-foreground mt-2">
-                      Upload an image and click "Analyze Image" to get results
+                      Upload an image and click &quot;Analyze Image&quot; to get results
                     </p>
                   </div>
                 )}
@@ -287,7 +287,7 @@ export default function MelanomaScreeningPage() {
               </p>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <strong>A - Asymmetry:</strong> One half doesn't match the other half.
+                  <strong>A - Asymmetry:</strong> One half doesn&apos;t match the other half.
                 </li>
                 <li>
                   <strong>B - Border:</strong> Irregular, ragged, notched, or blurred edges.
