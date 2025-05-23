@@ -1,5 +1,5 @@
 import axios from "axios";
-import NextAuth from "next-auth";
+import NextAuth, { Session } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 const authOptions = {
@@ -35,7 +35,7 @@ const authOptions = {
     }),
   ],
   callbacks: {
-    async session({ session}) {
+    async session({ session}:{session:Session}) {
       
       // You can customize the session object here if needed
       return session;
