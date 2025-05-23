@@ -27,7 +27,7 @@ const axiosInstanceNormal=UseAxiosNormal()
 
 const handlecredentialsLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
-  console.log('l')
+    console.log('l')
     const form = (e.target as HTMLButtonElement).closest("form")
     if (form) {
       const formData = new FormData(form)
@@ -51,7 +51,7 @@ const handlecredentialsLogin = async (e: React.MouseEvent<HTMLButtonElement>) =>
         lastLoginTime:new Date().toISOString(),
       }
       try{
-        const response =await axiosInstanceNormal.post(`/signin/${data?.email}`,userInformation)
+        const response =await axiosInstanceNormal.get(`/signin/${data?.email}`)
       if (response?.data?.status && response.data.userInfo) {
         const userInfo = response.data.userInfo;
         console.log("User info:", userInfo);
