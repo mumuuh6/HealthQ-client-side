@@ -1,33 +1,30 @@
 "use client"
 import { useQuery } from "@tanstack/react-query";
-import { useSession } from "next-auth/react";
 import UseAxiosNormal from "../Instances/page";
 
-const UseDoctors = () => {
+const useDoctors = () => {
   const axiossecure = UseAxiosNormal();
-  const { data: session } = useSession();
+  
 
-  const { data: doctorinfo = [] } = useQuery({
-    queryKey: ['doctor', session?.user?.email],
-    queryFn: async () => {
-      const res = await axiossecure.get(`/find/role/${session?.user?.email}`);
-      return res.data;
-    },
-    enabled: !!session?.user?.email,
-  });
+  // const { data: doctorinfo = [] } = useQuery({
+  //   queryKey: ['doctor', session?.user?.email],
+  //   queryFn: async () => {
+  //     const res = await axiossecure.get(`/find/role/${session?.user?.email}`);
+  //     return res.data;
+  //   },
+  //   enabled: !!session?.user?.email,
+  // });
 
-  const { data: roleinfo = [] ,isLoading} = useQuery({
-    queryKey: ['doctorrole', doctorinfo?.userType],
+  const { data: roleinfo = []} = useQuery({
+    queryKey: ['doctorrole'],
     queryFn: async () => {
       const res = await axiossecure.get(`/doctor/doctor`);
       return res.data.data;
     },
   });
-    if (isLoading) {
-        <p>Loading...</p>
-    }
 
-  return { doctorinfo, roleinfo};
+
+  return roleinfo;
 };
 
-export default UseDoctors;
+export default useDoctors;

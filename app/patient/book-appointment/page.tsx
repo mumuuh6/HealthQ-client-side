@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils"
 import UseAxiosNormal from "@/app/hook/Instances/page"
 import { useQuery } from "@tanstack/react-query"
 import { useSession } from "next-auth/react"
-import UseDoctors from "@/app/hook/Doctor/page"
+import useDoctors from "@/app/hook/Doctor/page"
 
 
 
@@ -50,6 +50,21 @@ type AppointmentFormValues = {
   reason: string
   notes: string
 }
+interface Doctor {
+  _id: string;
+  name: string;
+  email: string;
+  userType: "doctor";
+  lastLoginTime: string | null;
+  createdAt: string;
+  password: string;
+  role: string;
+  failedAttempts: number;
+  block: boolean;
+  specialty: string;
+  availableDays: number[]; // Assuming days are represented as integers (e.g., 1 = Monday)
+}
+
 
 export default function BookAppointmentPage() {
   const router = useRouter()
@@ -59,8 +74,9 @@ export default function BookAppointmentPage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<number | null>(null)
   const axiossecure=UseAxiosNormal();
-  const {roleinfo:doctors}=UseDoctors();
-  // console.log("Doctors data:", JSON.stringify(doctors));
+  const doctors=useDoctors();
+  console.log("Doctors data:", doctors)
+  
   const form = useForm<AppointmentFormValues>({
     defaultValues: {
       doctorId: '',
@@ -70,6 +86,8 @@ export default function BookAppointmentPage() {
       notes: "",
     },
   })
+  //console.log("Doctors data:", JSON.stringify(doctors));
+
 
   const handleDoctorSelect = (doctorId: string) => {
     console.log("Selected doctor ID:", doctorId)
@@ -114,7 +132,7 @@ console.log("Selected doctor:", selectedDoctor)
 
   }
 
-  const selectedDoctorData = doctors.find((doctor) => doctor._id === selectedDoctor)||null
+  const selectedDoctorData = doctors.find((doctor:Doctor) => doctor._id === selectedDoctor)||null
   const selectedTimeSlotData = timeSlots.find((slot) => slot.id === selectedTimeSlot)
 
   return (
@@ -200,7 +218,7 @@ console.log("Selected doctor:", selectedDoctor)
                 </CardHeader>
                 <CardContent className="grid gap-4">
                   {doctors.length==0?(<>No doctor available</>):(
-                    doctors.map((doctor) => (
+                    doctors.map((doctor:Doctor) => (
                     <div
                       key={doctor._id}
                       className={cn(
