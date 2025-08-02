@@ -19,10 +19,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             `https://health-q-tau.vercel.app/signin/${email}`,
             { email, password }
           );
-          console.log(res.data)
+          
           const user = res?.data?.userInfo;
           if (user) {
-            console.log(user, 'session in upper');
+            
             return {
               id: user._id,
               name: user.name,
@@ -30,7 +30,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               role: user.role,
             };
           } else {
-            console.log('User not found');
+            
             return null;
           }
         } catch (error) {
@@ -44,7 +44,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     async session({ session }) {
       
-      console.log(session, 'session in lower');
+      
       return session;
     },
     

@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import React from "react"
 import { toast } from "react-toastify";
 
-import UseAxiosNormal from "@/app/Instances/page"
+import UseAxiosNormal from "@/app/hook/Instances/page"
 
 type RegisterFormValues = {
   name: string
@@ -45,7 +45,7 @@ const axiosInstanceNormal=UseAxiosNormal()
         confirmPassword: formData.get("confirmPassword") as string,
         userType: formData.get("userType") as string,
       }
-      console.log("Form Data:", data)
+      
       if (!data.name || !data.email || !data.password || !data.confirmPassword) {
         toast.error("Please fill in all required fields.");
         }
@@ -81,10 +81,10 @@ const userData={
   lastLoginTime:new Date().toISOString(),
   createdAt: new Date().toISOString(),
 }
-console.log("User Data:", userData)
+
     try{
       const response =await axiosInstanceNormal.post("signup",userData);
-      console.log("Response from server:", response.data)
+
       if(response?.data?.status){
         Swal.fire({
           title: "Success!",

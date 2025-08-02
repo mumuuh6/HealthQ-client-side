@@ -5,18 +5,18 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Clock, Menu, X } from "lucide-react"
 import { ThemeToggle } from "@/app/components/theme-toggle"
 import { signOut, useSession } from "next-auth/react"
-import UseAxiosNormal from "../Instances/page"
+import UseAxiosNormal from "../hook/Instances/page"
 import { useRouter } from "next/navigation"
 
 export function Navbar() {
   const router=useRouter()
   const pathname = usePathname()
   const {data:session,status}=useSession();
-  console.log(session, 'session in navbar');
+
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [role,setrole]=useState('');
   const axiosinstance=UseAxiosNormal();
@@ -54,8 +54,8 @@ export function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 md:px-6">
-      <div className="container flex h-16 items-center justify-between">
+    <header className="max-w-7xl mx-auto sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 md:px-6">
+      <div className=" flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center gap-2 font-semibold">
           <motion.div initial={{ rotate: -10 }} animate={{ rotate: 0 }} transition={{ duration: 0.5 }}>
             <Clock className="h-6 w-6 text-primary" />
@@ -88,12 +88,18 @@ export function Navbar() {
               </Button>
               </Link> */}
               <p>{session?.user?.email}</p>
-              <Button variant="outline" onClick={() => {
-                signOut();
-                router.push('/')
-              }} className="ml-2">
-                Log out
-              </Button>
+              <Button
+  variant="outline"
+  onClick={() => {
+    signOut().then(() => {
+      router.push('/');
+    });
+  }}
+  className="ml-2"
+>
+  Log out
+</Button>
+
             </div>
             
           ) : (
@@ -106,26 +112,26 @@ export function Navbar() {
         </div>
 
         {/* Mobile navigation */}
+        
         <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+          <SheetTitle></SheetTitle>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="md:hidden">
               <Menu className="h-5 w-5" />
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+          
+         <SheetContent side="right" className="w-[300px] sm:w-[400px]">
             <div className="flex flex-col h-full">
               <div className="flex items-center justify-between border-b py-4">
                 <Link href="/" className="flex items-center gap-2 font-semibold" onClick={() => setIsMenuOpen(false)}>
                   <Clock className="h-6 w-6 text-primary" />
                   <span>HealthQ</span>
                 </Link>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 mr-10">
                   <ThemeToggle />
-                  <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(false)}>
-                    <X className="h-5 w-5" />
-                    <span className="sr-only">Close menu</span>
-                  </Button>
+                  
                 </div>
               </div>
 
@@ -145,17 +151,27 @@ export function Navbar() {
               </nav>
 
               <div className="mt-auto border-t py-6 flex flex-col gap-4">
-                <Link href="/login" onClick={() => setIsMenuOpen(false)}>
-                  <Button variant="outline" className="w-full">
-                    Log in
-                  </Button>
-                </Link>
-                <Link href="/register" onClick={() => setIsMenuOpen(false)}>
-                  <Button className="w-full">Sign up</Button>
-                </Link>
+                {status === "authenticated" ? (
+            <div className="flex flex-col justify-start items-start gap-2 ml-2">
+              <p>{session?.user?.email}</p>
+              <Button variant="outline" onClick={() => {
+                signOut();
+                router.push('/')
+              }} >
+                Log out
+              </Button>
+            </div>
+            
+          ) : (
+            <>
+              <Link href="/login">
+                <Button variant="outline">Log in</Button>
+              </Link>
+            </>
+          )}
               </div>
             </div>
-          </SheetContent>
+          </SheetContent> 
         </Sheet>
       </div>
     </header>

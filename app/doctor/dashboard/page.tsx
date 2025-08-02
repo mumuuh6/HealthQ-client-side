@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, Clock, UserCheck, UserX, ChevronRight, Users } from "lucide-react"
+import { useSession } from "next-auth/react"
 
 
 // Mock data for queue and appointments
@@ -113,7 +114,7 @@ const upcomingAppointments = [
 export default function DoctorDashboard() {
   const [activeTab, setActiveTab] = useState("today")
   const [currentPatient, setCurrentPatient] = useState(queuePatients[0])
-
+  const {data: session} = useSession();
   const handleNextPatient = () => {
     Swal.fire({
       title: "Complete current appointment?",
@@ -143,7 +144,7 @@ export default function DoctorDashboard() {
       <main className="flex-1 p-4 md:p-6 bg-muted/40">
         <div className="mx-auto max-w-6xl space-y-6">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Welcome, Dr. Roberts</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Welcome, {session?.user?.name}</h1>
             <p className="">Manage your patient queue and appointments</p>
           </div>
 

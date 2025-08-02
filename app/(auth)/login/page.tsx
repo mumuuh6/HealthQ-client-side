@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import UseAxiosNormal from "@/app/Instances/page"
+import UseAxiosNormal from "@/app/hook/Instances/page"
 import { toast } from "react-toastify"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
@@ -54,7 +54,7 @@ const handlecredentialsLogin = async (e: React.MouseEvent<HTMLButtonElement>) =>
       }
       try{
         const res=await axiosInstanceNormal.get(`/signin/${data.email}`);
-        console.log("Response from server:", res.data)
+        
         if(res?.data?.status){
           const userInfo = res?.data?.userInfo; 
           await signIn('credentials', {

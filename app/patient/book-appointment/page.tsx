@@ -13,15 +13,19 @@ import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
 import {  ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
-import UseAxiosNormal from "@/app/Instances/page"
+import UseAxiosNormal from "@/app/hook/Instances/page"
+import { useQuery } from "@tanstack/react-query"
+import { useSession } from "next-auth/react"
+import UseDoctors from "@/app/hook/Doctor/page"
 
-// Mock data for doctors and time slots
-const doctors = [
-  { id: 1, name: "Dr. Sarah Johnson", specialty: "Cardiologist", availableDays: [1, 3, 5] },
-  { id: 2, name: "Dr. Michael Chen", specialty: "Dermatologist", availableDays: [2, 4] },
-  { id: 3, name: "Dr. Emily Wilson", specialty: "General Practitioner", availableDays: [1, 2, 3, 4, 5] },
-  { id: 4, name: "Dr. James Rodriguez", specialty: "Orthopedic Surgeon", availableDays: [1, 3, 5] },
-]
+
+
+// const doctors = [
+//   { id: 1, name: "Dr. Sarah Johnson", specialty: "Cardiologist", availableDays: [1, 3, 5] },
+//   { id: 2, name: "Dr. Michael Chen", specialty: "Dermatologist", availableDays: [2, 4] },
+//   { id: 3, name: "Dr. Emily Wilson", specialty: "General Practitioner", availableDays: [1, 2, 3, 4, 5] },
+//   { id: 4, name: "Dr. James Rodriguez", specialty: "Orthopedic Surgeon", availableDays: [1, 3, 5] },
+// ]
 
 
 const timeSlots = [
@@ -40,7 +44,7 @@ const timeSlots = [
 ]
 
 type AppointmentFormValues = {
-  doctorId: number
+  doctorId: string
   date: Date | undefined
   timeSlotId: number
   reason: string
@@ -50,13 +54,16 @@ type AppointmentFormValues = {
 export default function BookAppointmentPage() {
   const router = useRouter()
   const [step, setStep] = useState(1)
-  const [selectedDoctor, setSelectedDoctor] = useState<number | null>(null)
+  
+  const [selectedDoctor, setSelectedDoctor] = useState<string | null>(null)
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<number | null>(null)
   const axiossecure=UseAxiosNormal();
+  const {roleinfo:doctors}=UseDoctors();
+  // console.log("Doctors data:", JSON.stringify(doctors));
   const form = useForm<AppointmentFormValues>({
     defaultValues: {
-      doctorId: 0,
+      doctorId: '',
       date: undefined,
       timeSlotId: 0,
       reason: "",
@@ -64,12 +71,13 @@ export default function BookAppointmentPage() {
     },
   })
 
-  const handleDoctorSelect = (doctorId: number) => {
+  const handleDoctorSelect = (doctorId: string) => {
+    console.log("Selected doctor ID:", doctorId)
     setSelectedDoctor(doctorId)
     form.setValue("doctorId", doctorId)
     setStep(2)
   }
-
+console.log("Selected doctor:", selectedDoctor)
   const handleDateSelect = (date: Date | undefined) => {
     setSelectedDate(date)
     form.setValue("date", date)
@@ -106,7 +114,7 @@ export default function BookAppointmentPage() {
 
   }
 
-  const selectedDoctorData = doctors.find((doctor) => doctor.id === selectedDoctor)
+  const selectedDoctorData = doctors.find((doctor) => doctor._id === selectedDoctor)||null
   const selectedTimeSlotData = timeSlots.find((slot) => slot.id === selectedTimeSlot)
 
   return (
@@ -191,14 +199,15 @@ export default function BookAppointmentPage() {
                   <CardDescription>Choose a healthcare provider for your appointment</CardDescription>
                 </CardHeader>
                 <CardContent className="grid gap-4">
-                  {doctors.map((doctor) => (
+                  {doctors.length==0?(<>No doctor available</>):(
+                    doctors.map((doctor) => (
                     <div
-                      key={doctor.id}
+                      key={doctor._id}
                       className={cn(
                         "flex items-center justify-between p-4 rounded-lg border cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors",
-                        selectedDoctor === doctor.id && "border-primary bg-primary/5",
+                        selectedDoctor === doctor._id && "border-primary bg-primary/5",
                       )}
-                      onClick={() => handleDoctorSelect(doctor.id)}
+                      onClick={() => handleDoctorSelect(doctor._id)}
                     >
                       <div className="flex items-center gap-4">
                         <div className="rounded-full bg-muted p-2">
@@ -224,7 +233,8 @@ export default function BookAppointmentPage() {
                       </div>
                       <ChevronRight className="h-5 w-5 " />
                     </div>
-                  ))}
+                  ))
+                  )}
                 </CardContent>
               </Card>
             )}
@@ -250,15 +260,14 @@ export default function BookAppointmentPage() {
                     mode="single"
                     selected={selectedDate}
                     onSelect={handleDateSelect}
-                    disabled={(date) => {
+                    disabled={(date) => { 
                       // Disable past dates
                       const isPastDate = date < new Date(new Date().setHours(0, 0, 0, 0))
                       // Disable weekends
-                      const isWeekend = date.getDay() === 0 || date.getDay() === 6
+                      const isWeekend =  date.getDay() === 5
                       // Disable dates not available for the selected doctor
-                      const isNotAvailableForDoctor = selectedDoctorData
-                        ? !selectedDoctorData.availableDays.includes(date.getDay())
-                        : true
+                      const isNotAvailableForDoctor = !selectedDoctorData?.availableDays||
+                      !selectedDoctorData.availableDays.includes(date.getDay());
 
                       return isPastDate || isWeekend || isNotAvailableForDoctor
                     }}
