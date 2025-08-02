@@ -92,7 +92,7 @@ export default function PatientProfilePage() {
                 <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
                   <div className="relative">
                     <Avatar className="h-24 w-24">
-                      <AvatarImage src="/placeholder-user.jpg" alt={profile.name} />
+                      <AvatarImage src="https://images.app.goo.gl/3wWrAmJDAEVYkPZy9" alt={profile.name} />
                       <AvatarFallback className="text-2xl">
                         {profile.name
                           .split(" ")

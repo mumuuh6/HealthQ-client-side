@@ -8,27 +8,27 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Clock, Menu, X } from "lucide-react"
 import { ThemeToggle } from "@/app/components/theme-toggle"
-import { useSession } from "next-auth/react"
+import { signOut, useSession } from "next-auth/react"
 import UseAxiosNormal from "../Instances/page"
+import { useRouter } from "next/navigation"
 
 export function Navbar() {
+  const router=useRouter()
   const pathname = usePathname()
-  const session=useSession()
-  console.log("from",session)
+  const {data:session,status}=useSession();
+  console.log(session, 'session in navbar');
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [role,setrole]=useState('');
   const axiosinstance=UseAxiosNormal();
   const fetchUserRole = async () => {
     try {
-      const response = await axiosinstance.get(`/find/role/${session?.data?.user?.email}`);
-      console.log("response",response.data.role)
+      const response = await axiosinstance.get(`/find/role/${session?.user?.email}`);
       setrole(response.data.role);
     } catch (error) {
       console.error('Error fetching user role:', error);
     }
   };
   fetchUserRole();
-  console.log("role",role)
   // Define navigation items
   const navItems = [
     { name: "Home", href: "/" },
@@ -80,14 +80,29 @@ export function Navbar() {
 
         <div className="hidden md:flex justify-center  items-center gap-4">
           <ThemeToggle />
-          <Link href="/login">
-            <Button variant="ghost" size="sm">
-              Log in
-            </Button>
-          </Link>
-          <Link href="/register">
-            <Button size="sm">Sign up</Button>
-          </Link>
+          {status === "authenticated" ? (
+            <div className="flex flex-row items-center gap-2">
+              {/* <Link href="/profile">
+              <Button variant="outline" className="hidden md:inline-flex">
+                Profile
+              </Button>
+              </Link> */}
+              <p>{session?.user?.email}</p>
+              <Button variant="outline" onClick={() => {
+                signOut();
+                router.push('/')
+              }} className="ml-2">
+                Log out
+              </Button>
+            </div>
+            
+          ) : (
+            <>
+              <Link href="/login">
+                <Button variant="outline">Log in</Button>
+              </Link>
+            </>
+          )}  
         </div>
 
         {/* Mobile navigation */}

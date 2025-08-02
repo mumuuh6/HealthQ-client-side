@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import UseAxiosNormal from "@/app/Instances/page"
 import { toast } from "react-toastify"
 import { signIn } from "next-auth/react"
+import { useRouter } from "next/navigation"
 
 type LoginFormValues = {
   email: string
@@ -16,7 +17,7 @@ type LoginFormValues = {
 }
 
 export default function LoginPage() {
-  // const router = useRouter()
+  const nav = useRouter()
 const axiosInstanceNormal=UseAxiosNormal()
   const loginForm = useForm<LoginFormValues>({
     defaultValues: {
@@ -27,11 +28,12 @@ const axiosInstanceNormal=UseAxiosNormal()
 
 const handlecredentialsLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
-    console.log('l')
+    
     const form = (e.target as HTMLButtonElement).closest("form")
     if (form) {
       const formData = new FormData(form)
       // Collecting all form data
+      
       const data = {
         email: formData.get("email") as string,
         password: formData.get("password") as string,
@@ -51,20 +53,21 @@ const handlecredentialsLogin = async (e: React.MouseEvent<HTMLButtonElement>) =>
         lastLoginTime:new Date().toISOString(),
       }
       try{
-        const response =await axiosInstanceNormal.get(`/signin/${data?.email}`)
-      if (response?.data?.status && response.data.userInfo) {
-        const userInfo = response.data.userInfo;
-        console.log("User info:", userInfo);
-        //manually sign the user in nextauth
-        await signIn("credentials", {
-          email: userInfo.email,
-          password: userInfo.password,
-          redirect: false,
-        });
-        // Redirect to the home page or any other page after successful sign-in
-        toast.success(`${response.data.message}`);
-      } else if (!response?.data?.status) {
-        toast.error(`${response.data.message}`);
+        const res=await axiosInstanceNormal.get(`/signin/${data.email}`);
+        console.log("Response from server:", res.data)
+        if(res?.data?.status){
+          const userInfo = res?.data?.userInfo; 
+          await signIn('credentials', {
+            email: userInformation?.email,
+            password: userInformation?.password,
+            redirect: false,})
+          toast.success(`signin successful`);
+           // Redirect to home page after successful login
+           nav.push(`${userInfo?.userType}/dashboard`);
+        }
+      else if (!res?.data?.status) {
+        console.error("Login failed");  
+        toast.error(`login failed`);
       }
       }
       catch(error){

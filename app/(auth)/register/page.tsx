@@ -34,7 +34,6 @@ export default function RegisterPage() {
 const axiosInstanceNormal=UseAxiosNormal()
   const handleSignUp =async (e:React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
-  console.log('l')
     const form = (e.target as HTMLButtonElement).closest("form")
     if (form) {
       const formData = new FormData(form)
@@ -85,6 +84,7 @@ const userData={
 console.log("User Data:", userData)
     try{
       const response =await axiosInstanceNormal.post("signup",userData);
+      console.log("Response from server:", response.data)
       if(response?.data?.status){
         Swal.fire({
           title: "Success!",
@@ -108,7 +108,7 @@ console.log("User Data:", userData)
           confirmButtonColor: "hsl(var(--primary))",
         })
       }
-      console.log("Response from server:", response)
+      
     }
     catch(error){
       console.error("Error Signing Up:",error)

@@ -167,7 +167,7 @@ export default function DoctorDashboard() {
                     <div className="space-y-6">
                       <div className="flex items-center gap-4">
                         <Avatar className="h-16 w-16">
-                          <AvatarImage src="/placeholder-user.jpg" alt={currentPatient.name} />
+                          <AvatarImage src="https://images.app.goo.gl/3wWrAmJDAEVYkPZy9" alt={currentPatient.name} />
                           <AvatarFallback>
                             {currentPatient.name
                               .split(" ")
