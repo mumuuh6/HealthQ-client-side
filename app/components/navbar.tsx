@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion } from "framer-motion"
@@ -20,7 +20,8 @@ export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [role,setrole]=useState('');
   const axiosinstance=UseAxiosNormal();
-  const fetchUserRole = async () => {
+useEffect(()=>{
+    const fetchUserRole = async () => {
     try {
       const response = await axiosinstance.get(`/find/role/${session?.user?.email}`);
       setrole(response.data.role);
@@ -29,6 +30,7 @@ export function Navbar() {
     }
   };
   fetchUserRole();
+},[session?.user?.email, axiosinstance])
   // Define navigation items
   const navItems = [
     { name: "Home", href: "/" },

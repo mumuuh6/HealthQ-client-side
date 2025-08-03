@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, Clock } from "lucide-react"
+import { useSession } from "next-auth/react"
 
 // Mock data for appointments
 const upcomingAppointments = [
@@ -54,7 +55,7 @@ const pastAppointments = [
 
 export default function PatientDashboard() {
   const [activeTab, setActiveTab] = useState("upcoming")
-
+  const {data:session} = useSession();  
   return (
     <div className="flex min-h-screen flex-col">
       
@@ -62,7 +63,7 @@ export default function PatientDashboard() {
         <div className="mx-auto max-w-6xl space-y-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">Welcome, John</h1>
+              <h1 className="text-2xl font-bold tracking-tight">Welcome, {session?.user?.name?.toUpperCase()}</h1>
               <p className="">Manage your appointments and queue status</p>
             </div>
             <Button asChild>

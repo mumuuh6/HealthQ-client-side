@@ -4,8 +4,6 @@ import UseAxiosNormal from "../Instances/page";
 
 const useDoctors = () => {
   const axiossecure = UseAxiosNormal();
-  
-
   // const { data: doctorinfo = [] } = useQuery({
   //   queryKey: ['doctor', session?.user?.email],
   //   queryFn: async () => {

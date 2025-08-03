@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { useEffect } from "react";
 import Swal from "sweetalert2";
 const axiosNormal= axios.create({
-    baseURL: `https://health-q-tau.vercel.app`,
+    baseURL: `http://localhost:5000`,
     // `https://health-q-tau.vercel.app` 
 })
 const UseAxiosNormal=()=>{

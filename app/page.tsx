@@ -58,13 +58,13 @@ export default function Home() {
               >
                 
                 
-                <Image
+                {/* <Image
                   alt="Queue Management Dashboard"
                   className="aspect-video overflow-hidden rounded-xl object-cover object-center"
                   src="/square-activity.png"
                   width={250}
                   height={50}
-                />
+                /> */}
               </motion.div>
             </div>
           </div>

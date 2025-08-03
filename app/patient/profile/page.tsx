@@ -10,7 +10,7 @@ import { SelectTrigger } from "@/components/ui/select"
 
 import { Select } from "@/components/ui/select"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 
 import { Button } from "@/components/ui/button"
@@ -23,45 +23,109 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {  Upload, Save, Lock } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { useSession } from "next-auth/react"
+
+
+import UseAxiosNormal from "@/app/hook/Instances/page"
+import Swal from "sweetalert2"
+import usePatients from "@/app/hook/usePatient"
 
 // Mock patient profile data
-const patientProfile = {
-  name: "John Doe",
-  email: "john.doe@example.com",
-  phone: "(555) 123-4567",
-  dateOfBirth: "1985-06-15",
-  gender: "male",
-  address: "123 Main St, Apt 4B, New York, NY 10001",
-  emergencyContact: {
-    name: "Jane Doe",
-    relationship: "Spouse",
-    phone: "(555) 987-6543",
-  },
-  medicalInfo: {
-    allergies: "Penicillin, Peanuts",
-    medications: "Lisinopril 10mg daily, Atorvastatin 20mg daily",
-    conditions: "Hypertension, High Cholesterol",
-    bloodType: "O+",
-  },
-  insurance: {
-    provider: "Blue Cross Blue Shield",
-    policyNumber: "XYZ123456789",
-    groupNumber: "GRP987654",
-    primaryHolder: "Self",
-  },
-}
+// const patientProfile = {
+//   name: "John Doe",
+//   email: "john.doe@example.com",
+//   phone: "(555) 123-4567",
+//   dateOfBirth: "1985-06-15",
+//   gender: "male",
+//   address: "123 Main St, Apt 4B, New York, NY 10001",
+//   emergencyContact: {
+//     name: "Jane Doe",
+//     relationship: "Spouse",
+//     phone: "(555) 987-6543",
+//   },
+//   medicalInfo: {
+//     allergies: "Penicillin, Peanuts",
+//     medications: "Lisinopril 10mg daily, Atorvastatin 20mg daily",
+//     conditions: "Hypertension, High Cholesterol",
+//     bloodType: "O+",
+//   },
+//   insurance: {
+//     provider: "Blue Cross Blue Shield",
+//     policyNumber: "XYZ123456789",
+//     groupNumber: "GRP987654",
+//     primaryHolder: "Self",
+//   },
+// }
 
 export default function PatientProfilePage() {
+
   const [activeTab, setActiveTab] = useState("personal")
   const [isEditing, setIsEditing] = useState(false)
-  const [profile, setProfile] = useState(patientProfile)
 
-  const handleSaveProfile = () => {
-    // In a real app, you would save the profile data to your backend here
+  const { data: session, status } = useSession();
+  const axiossecure=UseAxiosNormal()
+  const {patientinfo:patient,refetch}=usePatients();
+  const isLoading = status === "loading";
+  
+  const [patientProfile, setPatientProfile] = useState({
+    name: '',
+    email: '',
+    phone: "",
+    dateOfBirth: "",
+    gender: "male",
+    address: "",
+    emergencyContact: {
+      name: "",
+      relationship: "",
+      phone: "",
+    },
+    medicalInfo: {
+      allergies: "",
+      medications: "",
+      conditions: "",
+      bloodType: "",
+    },
+    insurance: {
+      provider: "",
+      policyNumber: "",
+      groupNumber: "",
+      primaryHolder: "",
+    },
+  });
+
+  useEffect(() => {
+    
+    refetch()
+  }, []);
+  const [profile, setProfile] = useState(patientProfile)
+  useEffect(() => {
+  if (patient) {
+    setPatientProfile(patient);
+    setProfile(patient);
+  }
+}, [patient]);
+  if (isLoading) return ;
+
+
+   const handleSaveProfile =async () => {
+    
+    try{
+      const res=await axiossecure.patch(`/profile/${session?.user?.email}`,profile);
+      if(res?.data?.result?.modifiedCount > 0){
+        Swal.fire({
+          title: "Profile Updated Successfully",
+          icon: "success",
+        });
+      }
+      await refetch();
+    }
+    catch(error){
+      console.error("Error saving profile:", error);
+      
+    }
     setIsEditing(false)
     // Show success message
   }
-
   return (
     <div className="flex min-h-screen flex-col">
       <main className="flex-1 p-4 md:p-6 bg-muted/40">
@@ -93,12 +157,12 @@ export default function PatientProfilePage() {
                   <div className="relative">
                     <Avatar className="h-24 w-24">
                       <AvatarImage src="https://images.app.goo.gl/3wWrAmJDAEVYkPZy9" alt={profile.name} />
-                      <AvatarFallback className="text-2xl">
+                      {/* <AvatarFallback className="text-2xl">
                         {profile.name
                           .split(" ")
                           .map((n) => n[0])
                           .join("")}
-                      </AvatarFallback>
+                      </AvatarFallback> */}
                     </Avatar>
                     {isEditing && (
                       <Button
@@ -112,7 +176,7 @@ export default function PatientProfilePage() {
                     )}
                   </div>
                   <div>
-                    <CardTitle className="text-2xl">{profile.name}</CardTitle>
+                    <CardTitle className="text-2xl">{patient.name}</CardTitle>
                     <CardDescription className="text-lg">Patient</CardDescription>
                   </div>
                 </div>
@@ -122,8 +186,8 @@ export default function PatientProfilePage() {
                   <TabsList className="mb-4">
                     <TabsTrigger value="personal">Personal Info</TabsTrigger>
                     <TabsTrigger value="medical">Medical Info</TabsTrigger>
-                    <TabsTrigger value="insurance">Insurance</TabsTrigger>
-                    <TabsTrigger value="security">Security</TabsTrigger>
+                    {/* <TabsTrigger value="insurance">Insurance</TabsTrigger>
+                    <TabsTrigger value="security">Security</TabsTrigger> */}
                   </TabsList>
                   <TabsContent value="personal" className="space-y-6">
                     {isEditing ? (
@@ -134,6 +198,7 @@ export default function PatientProfilePage() {
                             <Input
                               id="name"
                               value={profile.name}
+                              placeholder={patient.name}
                               onChange={(e) => setProfile({ ...profile, name: e.target.value })}
                             />
                           </div>
@@ -143,7 +208,8 @@ export default function PatientProfilePage() {
                               id="email"
                               type="email"
                               value={profile.email}
-                              onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                              placeholder={patient.email}
+                              readOnly
                             />
                           </div>
                           <div className="space-y-2">
@@ -151,6 +217,7 @@ export default function PatientProfilePage() {
                             <Input
                               id="phone"
                               value={profile.phone}
+                              placeholder={patient.phone}
                               onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
                             />
                           </div>
@@ -190,6 +257,7 @@ export default function PatientProfilePage() {
                           <Input
                             id="address"
                             value={profile.address}
+                            placeholder={patient.address}
                             onChange={(e) => setProfile({ ...profile, address: e.target.value })}
                           />
                         </div>
@@ -200,7 +268,8 @@ export default function PatientProfilePage() {
                               <Label htmlFor="emergency-name">Name</Label>
                               <Input
                                 id="emergency-name"
-                                value={profile.emergencyContact.name}
+                                value={profile.emergencyContact?.name}
+                                placeholder={patient.emergencyContact?.name}
                                 onChange={(e) =>
                                   setProfile({
                                     ...profile,
@@ -216,7 +285,8 @@ export default function PatientProfilePage() {
                               <Label htmlFor="emergency-relationship">Relationship</Label>
                               <Input
                                 id="emergency-relationship"
-                                value={profile.emergencyContact.relationship}
+                                value={profile.emergencyContact?.relationship}
+                                placeholder={patient.emergencyContact?.relationship}
                                 onChange={(e) =>
                                   setProfile({
                                     ...profile,
@@ -232,7 +302,8 @@ export default function PatientProfilePage() {
                               <Label htmlFor="emergency-phone">Phone</Label>
                               <Input
                                 id="emergency-phone"
-                                value={profile.emergencyContact.phone}
+                                value={profile.emergencyContact?.phone}
+                                placeholder={patient.emergencyContact?.phone}
                                 onChange={(e) =>
                                   setProfile({
                                     ...profile,
@@ -254,24 +325,24 @@ export default function PatientProfilePage() {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                               <p className="text-sm ">Email</p>
-                              <p>{profile.email}</p>
+                              <p>{patient.email}</p>
                             </div>
                             <div>
                               <p className="text-sm ">Phone</p>
-                              <p>{profile.phone}</p>
+                              <p>{patient.phone}</p>
                             </div>
                             <div>
                               <p className="text-sm ">Date of Birth</p>
-                              <p>{new Date(profile.dateOfBirth).toLocaleDateString()}</p>
+                              <p>{new Date(patient.dateOfBirth).toLocaleDateString()}</p>
                             </div>
                             <div>
                               <p className="text-sm ">Gender</p>
-                              <p>{profile.gender.charAt(0).toUpperCase() + profile.gender.slice(1)}</p>
+                              <p>{patient.gender?patient.gender.charAt(0).toUpperCase() + profile.gender?.slice(1):"Not"}</p>
                             </div>
                           </div>
                           <div>
                             <p className="text-sm ">Address</p>
-                            <p>{profile.address}</p>
+                            <p>{patient.address}</p>
                           </div>
                         </div>
                         <Separator />
@@ -280,15 +351,15 @@ export default function PatientProfilePage() {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                               <p className="text-sm ">Name</p>
-                              <p>{profile.emergencyContact.name}</p>
+                              <p>{patient.emergencyContact?.name}</p>
                             </div>
                             <div>
                               <p className="text-sm ">Relationship</p>
-                              <p>{profile.emergencyContact.relationship}</p>
+                              <p>{patient.emergencyContact?.relationship}</p>
                             </div>
                             <div>
                               <p className="text-sm ">Phone</p>
-                              <p>{profile.emergencyContact.phone}</p>
+                              <p>{patient.emergencyContact?.phone}</p>
                             </div>
                           </div>
                         </div>
@@ -302,7 +373,8 @@ export default function PatientProfilePage() {
                           <Label htmlFor="allergies">Allergies</Label>
                           <Textarea
                             id="allergies"
-                            value={profile.medicalInfo.allergies}
+                            value={profile.medicalInfo?.allergies}
+                            placeholder={patient.medicalInfo?.allergies || "None"}
                             onChange={(e) =>
                               setProfile({
                                 ...profile,
@@ -316,6 +388,7 @@ export default function PatientProfilePage() {
                           <Textarea
                             id="medications"
                             value={profile.medicalInfo.medications}
+                            placeholder={patient.medicalInfo?.medications || "None"}
                             onChange={(e) =>
                               setProfile({
                                 ...profile,
@@ -328,7 +401,8 @@ export default function PatientProfilePage() {
                           <Label htmlFor="conditions">Medical Conditions</Label>
                           <Textarea
                             id="conditions"
-                            value={profile.medicalInfo.conditions}
+                            value={profile.medicalInfo?.conditions}
+                            placeholder={patient.medicalInfo?.conditions || "None"}
                             onChange={(e) =>
                               setProfile({
                                 ...profile,
@@ -369,34 +443,34 @@ export default function PatientProfilePage() {
                         <div className="space-y-3">
                           <div>
                             <p className="text-sm ">Allergies</p>
-                            <p>{profile.medicalInfo.allergies || "None"}</p>
+                            <p>{patient.medicalInfo?.allergies || "None"}</p>
                           </div>
                         </div>
                         <Separator />
                         <div className="space-y-3">
                           <div>
                             <p className="text-sm ">Current Medications</p>
-                            <p>{profile.medicalInfo.medications || "None"}</p>
+                            <p>{patient.medicalInfo?.medications || "None"}</p>
                           </div>
                         </div>
                         <Separator />
                         <div className="space-y-3">
                           <div>
                             <p className="text-sm ">Medical Conditions</p>
-                            <p>{profile.medicalInfo.conditions || "None"}</p>
+                            <p>{patient.medicalInfo?.conditions || "None"}</p>
                           </div>
                         </div>
                         <Separator />
                         <div className="space-y-3">
                           <div>
                             <p className="text-sm ">Blood Type</p>
-                            <p>{profile.medicalInfo.bloodType || "Unknown"}</p>
+                            <p>{patient.medicalInfo?.bloodType || "Unknown"}</p>
                           </div>
                         </div>
                       </div>
                     )}
                   </TabsContent>
-                  <TabsContent value="insurance" className="space-y-6">
+                  {/* <TabsContent value="insurance" className="space-y-6">
                     {isEditing ? (
                       <div className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -404,7 +478,8 @@ export default function PatientProfilePage() {
                             <Label htmlFor="insurance-provider">Insurance Provider</Label>
                             <Input
                               id="insurance-provider"
-                              value={profile.insurance.provider}
+                              value={profile.insurance?.provider}
+                              placeholder={patient.insurance?.provider || "None"}
                               onChange={(e) =>
                                 setProfile({
                                   ...profile,
@@ -418,6 +493,7 @@ export default function PatientProfilePage() {
                             <Input
                               id="policy-number"
                               value={profile.insurance.policyNumber}
+                              placeholder={patient.insurance?.policyNumber || "None"}
                               onChange={(e) =>
                                 setProfile({
                                   ...profile,
@@ -431,6 +507,7 @@ export default function PatientProfilePage() {
                             <Input
                               id="group-number"
                               value={profile.insurance.groupNumber}
+                              placeholder={patient.insurance?.groupNumber || "None"}
                               onChange={(e) =>
                                 setProfile({
                                   ...profile,
@@ -444,6 +521,7 @@ export default function PatientProfilePage() {
                             <Input
                               id="primary-holder"
                               value={profile.insurance.primaryHolder}
+                              placeholder={patient.insurance?.primaryHolder || "Self"}
                               onChange={(e) =>
                                 setProfile({
                                   ...profile,
@@ -460,26 +538,26 @@ export default function PatientProfilePage() {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                               <p className="text-sm ">Insurance Provider</p>
-                              <p>{profile.insurance.provider}</p>
+                              <p>{patient.insurance?.provider}</p>
                             </div>
                             <div>
                               <p className="text-sm ">Policy Number</p>
-                              <p>{profile.insurance.policyNumber}</p>
+                              <p>{patient.insurance?.policyNumber}</p>
                             </div>
                             <div>
                               <p className="text-sm ">Group Number</p>
-                              <p>{profile.insurance.groupNumber}</p>
+                              <p>{patient.insurance?.groupNumber}</p>
                             </div>
                             <div>
                               <p className="text-sm ">Primary Holder</p>
-                              <p>{profile.insurance.primaryHolder}</p>
+                              <p>{patient.insurance?.primaryHolder}</p>
                             </div>
                           </div>
                         </div>
                       </div>
                     )}
-                  </TabsContent>
-                  <TabsContent value="security" className="space-y-6">
+                  </TabsContent> */}
+                  {/* <TabsContent value="security" className="space-y-6">
                     <div className="space-y-4">
                       <h3 className="text-lg font-medium">Change Password</h3>
                       <div className="space-y-4">
@@ -517,7 +595,7 @@ export default function PatientProfilePage() {
                       </p>
                       <Button variant="outline">Manage Privacy Settings</Button>
                     </div>
-                  </TabsContent>
+                  </TabsContent> */}
                 </Tabs>
               </CardContent>
             </Card>

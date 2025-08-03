@@ -14,8 +14,7 @@ import { format } from "date-fns"
 import {  ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import UseAxiosNormal from "@/app/hook/Instances/page"
-import { useQuery } from "@tanstack/react-query"
-import { useSession } from "next-auth/react"
+
 import useDoctors from "@/app/hook/Doctor/page"
 
 
