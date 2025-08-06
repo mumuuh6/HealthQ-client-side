@@ -16,6 +16,9 @@ import { cn } from "@/lib/utils"
 import UseAxiosNormal from "@/app/hook/Instances/page"
 
 import useDoctors from "@/app/hook/Doctor/page"
+import { spec } from "node:test/reporters"
+import { stat } from "fs"
+import { useSession } from "next-auth/react"
 
 
 
@@ -44,8 +47,12 @@ const timeSlots = [
 
 type AppointmentFormValues = {
   doctorId: string
+  doctor?: string
+  specialty?: string
+  location?: string
+  status?: "upcoming" | "completed" | "cancelled"
   date: Date | undefined
-  timeSlotId: number
+  timeSlotId: string | number
   reason: string
   notes: string
 }
@@ -68,13 +75,13 @@ interface Doctor {
 export default function BookAppointmentPage() {
   const router = useRouter()
   const [step, setStep] = useState(1)
-  
+  const {data:session}=useSession();
   const [selectedDoctor, setSelectedDoctor] = useState<string | null>(null)
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState<number | null>(null)
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<number | string|null>(null)
   const axiossecure=UseAxiosNormal();
   const doctors=useDoctors();
-  console.log("Doctors data:", doctors)
+
   
   const form = useForm<AppointmentFormValues>({
     defaultValues: {
@@ -101,8 +108,9 @@ console.log("Selected doctor:", selectedDoctor)
     setStep(3)
   }
 
-  const handleTimeSelect = (timeSlotId: number) => {
+  const handleTimeSelect = (timeSlotId: number|string) => {
     setSelectedTimeSlot(timeSlotId)
+    
     form.setValue("timeSlotId", timeSlotId)
     setStep(4)
   }
@@ -115,8 +123,21 @@ console.log("Selected doctor:", selectedDoctor)
 
   const onSubmit = async(data: AppointmentFormValues) => {
     // In a real app, you would submit the appointment data to your backend here
-    console.log("Appointment data:", data)
-    const res=await axiossecure.post('/book-appointment', data);
+    const selectedDoctorDataa = doctors.find((doctor:Doctor) => doctor._id === data.doctorId)||null
+    console.log("Selected doctor data info:", selectedDoctorDataa)
+    const payload={
+      doctorId: selectedDoctorDataa._id,
+      date: data.date,
+      timeSlotId: data.timeSlotId,
+      reason: data.reason,
+      notes: data.notes,
+      doctor: selectedDoctorDataa.name,
+      specialty: selectedDoctorDataa.specialty,
+      status: "upcoming",
+      email: session?.user?.email,
+    }
+
+    const res=await axiossecure.post('/book-appointment', payload);
     if(res?.data?.data?.insertedId){
     // Show success message
     Swal.fire({
@@ -320,7 +341,7 @@ console.log("Selected doctor:", selectedDoctor)
                           "flex items-center justify-center p-3 rounded-lg border cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors",
                           selectedTimeSlot === slot.id && "border-primary bg-primary/5",
                         )}
-                        onClick={() => handleTimeSelect(slot.id)}
+                        onClick={() => handleTimeSelect(slot.time)}
                       >
                         <span className="font-medium">{slot.time}</span>
                       </div>

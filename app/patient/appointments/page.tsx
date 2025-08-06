@@ -11,102 +11,52 @@ import { Calendar,  Plus, ChevronRight, Filter } from "lucide-react"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { format } from "date-fns"
+import UseAxiosNormal from "@/app/hook/Instances/page"
+import { useQuery } from "@tanstack/react-query"
+import { useSession } from "next-auth/react"
 
-// Mock data for appointments
-const appointments = [
-  {
-    id: 1,
-    doctor: "Dr. Sarah Johnson",
-    specialty: "Cardiologist",
-    date: new Date(2025, 3, 20), // April 20, 2025
-    time: "10:00 AM",
-    status: "upcoming",
-    location: "Main Hospital, Room 302",
-    notes: "Follow-up appointment for blood pressure monitoring",
-  },
-  {
-    id: 2,
-    doctor: "Dr. Michael Chen",
-    specialty: "Dermatologist",
-    date: new Date(2025, 3, 25), // April 25, 2025
-    time: "2:30 PM",
-    status: "upcoming",
-    location: "Medical Plaza, Suite 105",
-    notes: "Annual skin check",
-  },
-  {
-    id: 3,
-    doctor: "Dr. Emily Wilson",
-    specialty: "General Practitioner",
-    date: new Date(2025, 3, 1), // April 1, 2025
-    time: "9:15 AM",
-    status: "completed",
-    location: "Main Hospital, Room 210",
-    notes: "Regular check-up",
-  },
-  {
-    id: 4,
-    doctor: "Dr. James Rodriguez",
-    specialty: "Orthopedic Surgeon",
-    date: new Date(2025, 2, 15), // March 15, 2025
-    time: "11:30 AM",
-    status: "completed",
-    location: "Orthopedic Center, Room 405",
-    notes: "Post-surgery follow-up",
-  },
-  {
-    id: 5,
-    doctor: "Dr. Lisa Martinez",
-    specialty: "Neurologist",
-    date: new Date(2025, 1, 10), // February 10, 2025
-    time: "3:00 PM",
-    status: "completed",
-    location: "Neurology Center, Suite 200",
-    notes: "Headache consultation",
-  },
-  {
-    id: 6,
-    doctor: "Dr. Robert Taylor",
-    specialty: "Pulmonologist",
-    date: new Date(2025, 0, 5), // January 5, 2025
-    time: "1:45 PM",
-    status: "completed",
-    location: "Respiratory Clinic, Room 110",
-    notes: "Breathing assessment",
-  },
-  {
-    id: 7,
-    doctor: "Dr. Sarah Johnson",
-    specialty: "Cardiologist",
-    date: new Date(2024, 11, 12), // December 12, 2024
-    time: "11:00 AM",
-    status: "completed",
-    location: "Main Hospital, Room 302",
-    notes: "Initial consultation",
-  },
-  {
-    id: 8,
-    doctor: "Dr. Michael Chen",
-    specialty: "Dermatologist",
-    date: new Date(2024, 10, 8), // November 8, 2024
-    time: "10:30 AM",
-    status: "cancelled",
-    location: "Medical Plaza, Suite 105",
-    notes: "Rash examination",
-  },
-]
+type Appointment = {
+  id: number
+  doctor?: string | 'no name'
+  specialty?: string 
+  date: string
+  timeSlotId: number | string
+  time: string
+  status: "upcoming" | "completed" | "cancelled"
+  location?: string 
+  notes: string
+}
+
+
 
 export default function PatientAppointmentsPage() {
+  const axiosSecure = UseAxiosNormal();
   const [activeTab, setActiveTab] = useState("upcoming")
   const [sortBy, setSortBy] = useState("date-desc")
+  const { data: session } = useSession();
+  //real data would be fetched from an API or database
+ 
+  const { data: appointments = [] } = useQuery({
+  queryKey: ["appointments", session?.user?.email],
+  enabled: !!session?.user?.email,
+  queryFn: async () => {
+    const res = await axiosSecure.get(`/booked-appointments/${session?.user?.email}`);
+   
+    return (res.data?.data ?? []).map((appt:Appointment) => ({
+      ...appt,
+      date: new Date(appt.date),
+    }));
+  },
+});
 
   // Filter appointments based on active tab
-  const filteredAppointments = appointments.filter((appointment) => {
+  const filteredAppointments = appointments.filter((appointment:Appointment) => {
     if (activeTab === "upcoming") return appointment.status === "upcoming"
     if (activeTab === "completed") return appointment.status === "completed"
     if (activeTab === "cancelled") return appointment.status === "cancelled"
     return true
   })
+
 
   // Sort appointments based on selected sort option
   const sortedAppointments = [...filteredAppointments].sort((a, b) => {
@@ -173,7 +123,7 @@ export default function PatientAppointmentsPage() {
                     {sortedAppointments.length > 0 ? (
                       sortedAppointments.map((appointment) => (
                         <div
-                          key={appointment.id}
+                          key={appointment._id}
                           className="flex flex-col md:flex-row md:items-center justify-between p-4 rounded-lg border hover:border-primary/50 hover:bg-muted/50 transition-colors"
                         >
                           <div className="flex items-center gap-4">
@@ -202,7 +152,7 @@ export default function PatientAppointmentsPage() {
                               </div>
                               <p className="text-sm ">{appointment.specialty}</p>
                               <p className="text-sm">
-                                {format(appointment.date, "EEEE, MMMM d, yyyy")} at {appointment.time}
+                                {format(appointment.date, "EEEE, MMMM d, yyyy")} at {appointment.timeSlotId}
                               </p>
                             </div>
                           </div>
@@ -211,9 +161,11 @@ export default function PatientAppointmentsPage() {
                             <div className="flex gap-2">
                               {appointment.status === "upcoming" && (
                                 <>
+                                  <Link href={`/patient/book-appointment`}>
                                   <Button size="sm" variant="outline">
                                     Reschedule
                                   </Button>
+                                  </Link>
                                   <Button size="sm" variant="outline">
                                     Cancel
                                   </Button>
