@@ -43,7 +43,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async session({ session }) {
+      if (!session?.user?.email) return session;
+
+    try {
+
+      const res = await axios.get(
+        `https://health-q-tau.vercel.app/signin/${session?.user?.email}`
+      );
+      const user = res.data?.userInfo;
       
+      if (user) {
+        session.user.name = user.name;
+        
+      }
+    } catch (err) {
+      console.error("Error fetching user in session callback:", err);
+    }
       
       return session;
     },

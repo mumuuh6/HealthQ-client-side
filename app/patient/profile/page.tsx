@@ -62,7 +62,7 @@ export default function PatientProfilePage() {
   const [activeTab, setActiveTab] = useState("personal")
   const [isEditing, setIsEditing] = useState(false)
 
-  const { data: session, status } = useSession();
+  const { data: session, status,update } = useSession();
   const axiossecure=UseAxiosNormal()
   const {patientinfo:patient,refetch}=usePatients();
   const isLoading = status === "loading";
@@ -116,6 +116,7 @@ export default function PatientProfilePage() {
           title: "Profile Updated Successfully",
           icon: "success",
         });
+        await update();
       }
       await refetch();
     }

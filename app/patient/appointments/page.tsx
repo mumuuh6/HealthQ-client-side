@@ -25,6 +25,8 @@ type Appointment = {
   status: "upcoming" | "completed" | "cancelled"
   location?: string 
   notes: string
+  estimatedWaitTime?: string
+  queuePosition?: number
 }
 
 
