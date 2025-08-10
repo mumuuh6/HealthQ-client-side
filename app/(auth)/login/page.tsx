@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import UseAxiosNormal from "@/app/hook/Instances/page"
+import UseAxiosNormal from "@/app/hook/UseAxiosNormal"
 import { toast } from "react-toastify"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
@@ -18,7 +18,7 @@ type LoginFormValues = {
 
 export default function LoginPage() {
   const nav = useRouter()
-const axiosInstanceNormal=UseAxiosNormal()
+  const axiosInstanceNormal = UseAxiosNormal()
   const loginForm = useForm<LoginFormValues>({
     defaultValues: {
       email: "",
@@ -26,19 +26,19 @@ const axiosInstanceNormal=UseAxiosNormal()
     },
   })
 
-const handlecredentialsLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handlecredentialsLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
-    
+
     const form = (e.target as HTMLButtonElement).closest("form")
     if (form) {
       const formData = new FormData(form)
       // Collecting all form data
-      
+
       const data = {
         email: formData.get("email") as string,
         password: formData.get("password") as string,
       }
-      
+
       if (!data.email || !data.password) {
         Swal.fire({
           title: "Error",
@@ -47,30 +47,31 @@ const handlecredentialsLogin = async (e: React.MouseEvent<HTMLButtonElement>) =>
         })
         return
       }
-      const userInformation={
-        email:data.email,
-        password:data.password,
-        lastLoginTime:new Date().toISOString(),
+      const userInformation = {
+        email: data.email,
+        password: data.password,
+        lastLoginTime: new Date().toISOString(),
       }
-      try{
-        const res=await axiosInstanceNormal.get(`/signin/${data.email}`);
-        
-        if(res?.data?.status){
-          const userInfo = res?.data?.userInfo; 
+      try {
+        const res = await axiosInstanceNormal.get(`/signin/${data.email}`);
+        console.log("Response from login:", res.data);
+        if (res?.data?.status) {
+          const userInfo = res?.data?.userInfo;
           await signIn('credentials', {
             email: userInformation?.email,
             password: userInformation?.password,
-            redirect: false,})
+            redirect: false,
+          })
           toast.success(`signin successful`);
-           // Redirect to home page after successful login
-           nav.push(`${userInfo?.userType}/dashboard`);
+          // Redirect to home page after successful login
+          nav.push(`${userInfo?.userType}/dashboard`);
         }
-      else if (!res?.data?.status) {
-        console.error("Login failed");  
-        toast.error(`login failed`);
+        else if (!res?.data?.status) {
+          console.error("Login failed");
+          toast.error(`login failed`);
+        }
       }
-      }
-      catch(error){
+      catch (error) {
         console.error("Error during login:", error)
         Swal.fire({
           title: "Error",
@@ -131,10 +132,10 @@ const handlecredentialsLogin = async (e: React.MouseEvent<HTMLButtonElement>) =>
           </div>
         </CardContent>
         <CardFooter className="mt-3">
-          <Button 
-          onClick={handlecredentialsLogin}
-          type="submit" 
-          className="w-full">
+          <Button
+            onClick={handlecredentialsLogin}
+            type="submit"
+            className="w-full">
             Login
           </Button>
         </CardFooter>

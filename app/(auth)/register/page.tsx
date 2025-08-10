@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import React from "react"
 import { toast } from "react-toastify";
 
-import UseAxiosNormal from "@/app/hook/Instances/page"
+import UseAxiosNormal from "@/app/hook/UseAxiosNormal"
 
 type RegisterFormValues = {
   name: string
@@ -84,7 +84,7 @@ const userData={
 
     try{
       const response =await axiosInstanceNormal.post("signup",userData);
-
+      
       if(response?.data?.status){
         Swal.fire({
           title: "Success!",

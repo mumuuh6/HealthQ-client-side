@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, Clock } from "lucide-react"
 import { useSession } from "next-auth/react"
-import UseAxiosNormal from "@/app/hook/Instances/page"
+import UseAxiosNormal from "@/app/hook/UseAxiosNormal"
 import { useQuery } from "@tanstack/react-query"
 
 // // Mock data for appointments

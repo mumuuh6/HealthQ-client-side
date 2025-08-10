@@ -13,12 +13,13 @@ import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
 import {  ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
-import UseAxiosNormal from "@/app/hook/Instances/page"
 
-import useDoctors from "@/app/hook/Doctor/page"
-import { spec } from "node:test/reporters"
-import { stat } from "fs"
+
+
+
 import { useSession } from "next-auth/react"
+import UseAxiosNormal from "@/app/hook/UseAxiosNormal"
+import useDoctors from "@/app/hook/useDoctors"
 
 
 
@@ -80,7 +81,7 @@ export default function BookAppointmentPage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<number | string|null>(null)
   const axiossecure=UseAxiosNormal();
-  const doctors=useDoctors();
+  const {roleinfo:doctors}=useDoctors();
 
   
   const form = useForm<AppointmentFormValues>({
@@ -101,7 +102,7 @@ export default function BookAppointmentPage() {
     form.setValue("doctorId", doctorId)
     setStep(2)
   }
-console.log("Selected doctor:", selectedDoctor)
+
   const handleDateSelect = (date: Date | undefined) => {
     setSelectedDate(date)
     form.setValue("date", date)

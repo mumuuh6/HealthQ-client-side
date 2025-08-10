@@ -20,13 +20,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {  Upload, Save, Lock } from "lucide-react"
+import {  Upload, Save} from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useSession } from "next-auth/react"
 
 
-import UseAxiosNormal from "@/app/hook/Instances/page"
+import UseAxiosNormal from "@/app/hook/UseAxiosNormal"
 import Swal from "sweetalert2"
 import usePatients from "@/app/hook/usePatient"
 

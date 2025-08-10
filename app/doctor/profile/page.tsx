@@ -10,62 +10,131 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {  Upload, Save, Lock } from "lucide-react"
+import { Upload, Save, Lock } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
+import UseAxiosNormal from "@/app/hook/UseAxiosNormal"
+import { useSession } from "next-auth/react"
+import Swal from "sweetalert2"
+import useDoctors from "@/app/hook/useDoctors"
 
+const dayMap: Record<string, number> = {
+  monday: 1,
+  tuesday: 2,
+  wednesday: 3,
+  thursday: 4,
+  friday: 5,
+  saturday: 6,
+  sunday: 7,
+};
+const dayMapReverse: Record<number, string> = {
+  1: "Monday",
+  2: "Tuesday",
+  3: "Wednesday",
+  4: "Thursday",
+  5: "Friday",
+  6: "Saturday",
+  7: "Sunday",
+};
+interface Education {
+                        degree: string;
+                        institution: string;
+                        year: string;
+                      }
+// interface Certification {
+//                         name: string;
+//                         issuer: string;
+//                         year: string;
+//                       }
+function getDayNamesFromNumbers(days: number[]) {
+  return days
+    .map(day => dayMapReverse[day])
+    .filter(Boolean)
+    .join(", ");
+}
 // Mock doctor profile data
 const doctorProfile = {
-  name: "Dr. Sarah Roberts",
-  specialty: "Cardiologist",
-  email: "sarah.roberts@healthq.com",
-  phone: "(555) 123-4567",
-  address: "123 Medical Center Dr, Suite 456, New York, NY 10001",
-  bio: "Dr. Sarah Roberts is a board-certified cardiologist with over 10 years of experience in treating cardiovascular diseases. She specializes in preventive cardiology and heart failure management.",
-  education: [
-    {
-      degree: "Doctor of Medicine",
-      institution: "Harvard Medical School",
-      year: "2010",
-    },
-    {
-      degree: "Residency in Internal Medicine",
-      institution: "Massachusetts General Hospital",
-      year: "2013",
-    },
-    {
-      degree: "Fellowship in Cardiovascular Disease",
-      institution: "Stanford University Medical Center",
-      year: "2016",
-    },
-  ],
-  certifications: [
-    {
-      name: "Board Certification in Cardiovascular Disease",
-      issuer: "American Board of Internal Medicine",
-      year: "2016",
-    },
-    {
-      name: "Advanced Cardiac Life Support (ACLS)",
-      issuer: "American Heart Association",
-      year: "2023",
-    },
-  ],
+  name: "",
+  specialty: "",
+  email: "",
+  phone: "",
+  address: "",
+  availableDays: "",
+  bio: "",
+  // education: [
+  //   {
+  //     degree: "",
+  //     institution: "",
+  //     year: "",
+  //   },
+  //   {
+  //     degree: "",
+  //     institution: "",
+  //     year: "",
+  //   },
+  //   {
+  //     degree: "",
+  //     institution: "",
+  //     year: "",
+  //   },
+  // ],
+  // certifications: [
+  //   {
+  //     name: "",
+  //     issuer: "",
+  //     year: "",
+  //   },
+  //   {
+  //     name: "",
+  //     issuer: "",
+  //     year: "",
+  //   },
+  // ],
 }
 
 export default function DoctorProfilePage() {
+  const axiossecure = UseAxiosNormal()
+  const { doctorinfo:doctor, refetch } = useDoctors()
+  
+  const { data: session, update } = useSession()
   const [activeTab, setActiveTab] = useState("personal")
   const [isEditing, setIsEditing] = useState(false)
   const [profile, setProfile] = useState(doctorProfile)
 
-  const handleSaveProfile = () => {
+  const handleSaveProfile = async () => {
+    const daysArray = String(profile.availableDays || "")
+      .split(",")
+      .map(day => day.trim().toLowerCase())
+      .map(day => dayMap[day])
+      .filter(Boolean);
+    const updatedProfile = {
+      ...profile,
+      availableDays: daysArray.length > 0 ? daysArray : [],
+    }
+    //console.log("Updated profile data:", updatedProfile)
     // In a real app, you would save the profile data to your backend here
+    try {
+      const res = await axiossecure.patch(`/profile/${session?.user?.email}`, profile);
+
+      if (res?.data?.result?.modifiedCount > 0) {
+        Swal.fire({
+          title: "Profile Updated Successfully",
+          icon: "success",
+        });
+        await update();
+      }
+       await refetch();
+    }
+    catch (error) {
+      console.error("Error saving profile:", error);
+
+    }
     setIsEditing(false)
     // Show success message
   }
-
+  //console.log("Profile data:", JSON.stringify(profile, null, 2))
   return (
     <div className="flex min-h-screen flex-col">
-      
+
       <main className="flex-1 p-4 md:p-6 bg-muted/40">
         <div className="mx-auto max-w-4xl space-y-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -93,7 +162,7 @@ export default function DoctorProfilePage() {
               <CardHeader className="pb-4">
                 <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
                   <div className="relative">
-                    <Avatar className="h-24 w-24">
+                    {/* <Avatar className="h-24 w-24">
                       <AvatarImage src="https://images.app.goo.gl/3wWrAmJDAEVYkPZy9" alt={profile.name} />
                       <AvatarFallback className="text-2xl">
                         {profile.name
@@ -101,8 +170,8 @@ export default function DoctorProfilePage() {
                           .map((n) => n[0])
                           .join("")}
                       </AvatarFallback>
-                    </Avatar>
-                    {isEditing && (
+                    </Avatar> */}
+                    {/* {isEditing && (
                       <Button
                         size="icon"
                         variant="outline"
@@ -111,11 +180,11 @@ export default function DoctorProfilePage() {
                         <Upload className="h-4 w-4" />
                         <span className="sr-only">Upload avatar</span>
                       </Button>
-                    )}
+                    )} */}
                   </div>
                   <div>
-                    <CardTitle className="text-2xl">{profile.name}</CardTitle>
-                    <CardDescription className="text-lg">{profile.specialty}</CardDescription>
+                    <CardTitle className="text-2xl">{doctor.name}</CardTitle>
+                    <CardDescription className="text-lg">{doctor.specialty}</CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -123,8 +192,8 @@ export default function DoctorProfilePage() {
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                   <TabsList className="mb-4">
                     <TabsTrigger value="personal">Personal Info</TabsTrigger>
-                    <TabsTrigger value="qualifications">Qualifications</TabsTrigger>
-                    <TabsTrigger value="security">Security</TabsTrigger>
+                    {/* <TabsTrigger value="qualifications">Qualifications</TabsTrigger> */}
+                    {/* <TabsTrigger value="security">Security</TabsTrigger> */}
                   </TabsList>
                   <TabsContent value="personal" className="space-y-6">
                     {isEditing ? (
@@ -134,7 +203,8 @@ export default function DoctorProfilePage() {
                             <Label htmlFor="name">Full Name</Label>
                             <Input
                               id="name"
-                              value={profile.name}
+                              placeholder={doctor.name}
+                              value={profile?.name}
                               onChange={(e) => setProfile({ ...profile, name: e.target.value })}
                             />
                           </div>
@@ -142,7 +212,8 @@ export default function DoctorProfilePage() {
                             <Label htmlFor="specialty">Specialty</Label>
                             <Input
                               id="specialty"
-                              value={profile.specialty}
+                              value={profile?.specialty}
+                              placeholder={doctor.specialty}
                               onChange={(e) => setProfile({ ...profile, specialty: e.target.value })}
                             />
                           </div>
@@ -151,7 +222,9 @@ export default function DoctorProfilePage() {
                             <Input
                               id="email"
                               type="email"
-                              value={profile.email}
+                              placeholder={doctor.email}
+                              value={profile?.email}
+                              readOnly
                               onChange={(e) => setProfile({ ...profile, email: e.target.value })}
                             />
                           </div>
@@ -159,25 +232,39 @@ export default function DoctorProfilePage() {
                             <Label htmlFor="phone">Phone</Label>
                             <Input
                               id="phone"
-                              value={profile.phone}
+                              placeholder={doctor.phone}
+                              value={profile?.phone}
                               onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
                             />
                           </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="address">Address</Label>
+                            <Input
+                              id="address"
+                              placeholder={doctor.address}
+                              value={profile?.address}
+                              onChange={(e) => setProfile({ ...profile, address: e.target.value })}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="availableDays">Available Days</Label>
+                            <Input
+                              id="availableDays"
+                              placeholder="e.g. Monday, Thursday, Saturday"
+                              value={profile?.availableDays || ""}
+                              onChange={(e) => setProfile({ ...profile, availableDays: e.target.value })}
+
+                            />
+                          </div>
+
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="address">Address</Label>
-                          <Input
-                            id="address"
-                            value={profile.address}
-                            onChange={(e) => setProfile({ ...profile, address: e.target.value })}
-                          />
-                        </div>
+
                         <div className="space-y-2">
                           <Label htmlFor="bio">Professional Bio</Label>
                           <Textarea
                             id="bio"
                             rows={5}
-                            value={profile.bio}
+                            value={profile?.bio}
                             onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
                           />
                         </div>
@@ -189,30 +276,41 @@ export default function DoctorProfilePage() {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                               <p className="text-sm ">Email</p>
-                              <p>{profile.email}</p>
+                              <p>{doctor.email}</p>
                             </div>
                             <div>
                               <p className="text-sm ">Phone</p>
-                              <p>{profile.phone}</p>
+                              <p>{doctor.phone}</p>
                             </div>
                           </div>
-                          <div>
-                            <p className="text-sm ">Address</p>
-                            <p>{profile.address}</p>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <p className="text-sm ">Address</p>
+                              <p>{doctor.address}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm ">Available Days</p>
+                              <p>
+                                {Array.isArray(doctor.availableDays)
+                                  ? getDayNamesFromNumbers(doctor.availableDays)
+                                  : profile?.availableDays
+                                }
+                              </p>
+                            </div>
                           </div>
                         </div>
                         <Separator />
                         <div className="space-y-3">
                           <h3 className="text-lg font-medium">Professional Bio</h3>
-                          <p>{profile.bio}</p>
+                          <p>{doctor.bio}</p>
                         </div>
                       </div>
                     )}
                   </TabsContent>
-                  <TabsContent value="qualifications" className="space-y-6">
+                  {/* <TabsContent value="qualifications" className="space-y-6">
                     <div className="space-y-4">
                       <h3 className="text-lg font-medium">Education</h3>
-                      {profile.education.map((edu, index) => (
+                      {doctor?.education?.map((edu:Education, index:number) => (
                         <div key={index} className="p-4 border rounded-lg">
                           <div className="flex justify-between">
                             <div>
@@ -232,7 +330,7 @@ export default function DoctorProfilePage() {
                     <Separator />
                     <div className="space-y-4">
                       <h3 className="text-lg font-medium">Certifications</h3>
-                      {profile.certifications.map((cert, index) => (
+                      {doctor?.certifications?.map((cert:Certification, index:number) => (
                         <div key={index} className="p-4 border rounded-lg">
                           <div className="flex justify-between">
                             <div>
@@ -249,8 +347,8 @@ export default function DoctorProfilePage() {
                         </Button>
                       )}
                     </div>
-                  </TabsContent>
-                  <TabsContent value="security" className="space-y-6">
+                  </TabsContent> */}
+                  {/* <TabsContent value="security" className="space-y-6">
                     <div className="space-y-4">
                       <h3 className="text-lg font-medium">Change Password</h3>
                       <div className="space-y-4">
@@ -280,7 +378,7 @@ export default function DoctorProfilePage() {
                       </p>
                       <Button variant="outline">Enable 2FA</Button>
                     </div>
-                  </TabsContent>
+                  </TabsContent> */}
                 </Tabs>
               </CardContent>
             </Card>

@@ -6,31 +6,31 @@ import { usePathname } from "next/navigation"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Clock, Menu, X } from "lucide-react"
+import { Clock, Menu } from "lucide-react"
 import { ThemeToggle } from "@/app/components/theme-toggle"
 import { signOut, useSession } from "next-auth/react"
-import UseAxiosNormal from "../hook/Instances/page"
+import UseAxiosNormal from "@/app/hook/UseAxiosNormal"
 import { useRouter } from "next/navigation"
 
 export function Navbar() {
-  const router=useRouter()
+  const router = useRouter()
   const pathname = usePathname()
-  const {data:session,status}=useSession();
+  const { data: session, status } = useSession();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [role,setrole]=useState('');
-  const axiosinstance=UseAxiosNormal();
-useEffect(()=>{
-    const fetchUserRole = async () => {
-    try {
-      const response = await axiosinstance.get(`/find/role/${session?.user?.email}`);
-      setrole(response.data.role);
-    } catch (error) {
-      console.error('Error fetching user role:', error);
-    }
-  };
-  fetchUserRole();
-},[session?.user?.email, axiosinstance])
+  // const [role, setrole] = useState('');
+  // const axiosinstance = UseAxiosNormal();
+  // useEffect(() => {
+  //   const fetchUserRole = async () => {
+  //     try {
+  //       const response = await axiosinstance.get(`/find/role/${session?.user?.email}`);
+  //       setrole(response.data.role);
+  //     } catch (error) {
+  //       console.error('Error fetching user role:', error);
+  //     }
+  //   };
+  //   fetchUserRole();
+  // }, [session?.user?.email, axiosinstance])
   // Define navigation items
   const navItems = [
     { name: "Home", href: "/" },
@@ -40,11 +40,11 @@ useEffect(()=>{
     { name: "About Us", href: "/about" },
     {
       name: "Dashboard",
-      href: role === "doctor" ? "/doctor/dashboard" : "/patient/dashboard"
+      href:  "/patient/dashboard"
     },
     { name: "Melanoma Screening", href: "/melanoma-screening" },
-    
-    
+
+
   ]
 
   // Check if the current path matches the nav item
@@ -71,9 +71,8 @@ useEffect(()=>{
             <Link
               key={item.name}
               href={item.href}
-              className={`text-sm font-medium transition-colors hover:text-primary ${
-                isActive(item.href) ? "text-primary" : ""
-              }`}
+              className={`text-sm font-medium transition-colors hover:text-primary ${isActive(item.href) ? "text-primary" : ""
+                }`}
             >
               {item.name}
             </Link>
@@ -91,30 +90,30 @@ useEffect(()=>{
               </Link> */}
               <p>{session?.user?.email}</p>
               <Button
-  variant="outline"
-  onClick={() => {
-    signOut().then(() => {
-      router.push('/');
-    });
-  }}
-  className="ml-2"
->
-  Log out
-</Button>
+                variant="outline"
+                onClick={() => {
+                  signOut().then(() => {
+                    router.push('/');
+                  });
+                }}
+                className="ml-2"
+              >
+                Log out
+              </Button>
 
             </div>
-            
+
           ) : (
             <>
               <Link href="/login">
                 <Button variant="outline">Log in</Button>
               </Link>
             </>
-          )}  
+          )}
         </div>
 
         {/* Mobile navigation */}
-        
+
         <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
           <SheetTitle></SheetTitle>
           <SheetTrigger asChild>
@@ -123,8 +122,8 @@ useEffect(()=>{
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
-          
-         <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+
+          <SheetContent side="right" className="w-[300px] sm:w-[400px]">
             <div className="flex flex-col h-full">
               <div className="flex items-center justify-between border-b py-4">
                 <Link href="/" className="flex items-center gap-2 font-semibold" onClick={() => setIsMenuOpen(false)}>
@@ -133,7 +132,7 @@ useEffect(()=>{
                 </Link>
                 <div className="flex items-center gap-2 mr-10">
                   <ThemeToggle />
-                  
+
                 </div>
               </div>
 
@@ -142,9 +141,8 @@ useEffect(()=>{
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`px-2 py-1 text-lg font-medium transition-colors hover:text-primary ${
-                      isActive(item.href) ? "text-primary" : ""
-                    }`}
+                    className={`px-2 py-1 text-lg font-medium transition-colors hover:text-primary ${isActive(item.href) ? "text-primary" : ""
+                      }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {item.name}
@@ -154,26 +152,26 @@ useEffect(()=>{
 
               <div className="mt-auto border-t py-6 flex flex-col gap-4">
                 {status === "authenticated" ? (
-            <div className="flex flex-col justify-start items-start gap-2 ml-2">
-              <p>{session?.user?.email}</p>
-              <Button variant="outline" onClick={() => {
-                signOut();
-                router.push('/')
-              }} >
-                Log out
-              </Button>
-            </div>
-            
-          ) : (
-            <>
-              <Link href="/login">
-                <Button variant="outline">Log in</Button>
-              </Link>
-            </>
-          )}
+                  <div className="flex flex-col justify-start items-start gap-2 ml-2">
+                    <p>{session?.user?.email}</p>
+                    <Button variant="outline" onClick={() => {
+                      signOut();
+                      router.push('/')
+                    }} >
+                      Log out
+                    </Button>
+                  </div>
+
+                ) : (
+                  <>
+                    <Link href="/login">
+                      <Button variant="outline">Log in</Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
-          </SheetContent> 
+          </SheetContent>
         </Sheet>
       </div>
     </header>
