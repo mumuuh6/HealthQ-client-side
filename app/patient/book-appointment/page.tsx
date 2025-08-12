@@ -97,7 +97,7 @@ export default function BookAppointmentPage() {
 
 
   const handleDoctorSelect = (doctorId: string) => {
-    console.log("Selected doctor ID:", doctorId)
+    
     setSelectedDoctor(doctorId)
     form.setValue("doctorId", doctorId)
     setStep(2)
@@ -125,7 +125,8 @@ export default function BookAppointmentPage() {
   const onSubmit = async(data: AppointmentFormValues) => {
     // In a real app, you would submit the appointment data to your backend here
     const selectedDoctorDataa = doctors.find((doctor:Doctor) => doctor._id === data.doctorId)||null
-    console.log("Selected doctor data info:", selectedDoctorDataa)
+    
+    setSelectedTimeSlot(data.timeSlotId)
     const payload={
       doctorId: selectedDoctorDataa._id,
       date: data.date,
@@ -137,7 +138,7 @@ export default function BookAppointmentPage() {
       status: "upcoming",
       email: session?.user?.email,
     }
-
+    
     const res=await axiossecure.post('/book-appointment', payload);
     if(res?.data?.data?.insertedId){
     // Show success message
@@ -154,7 +155,7 @@ export default function BookAppointmentPage() {
   }
 
   const selectedDoctorData = doctors.find((doctor:Doctor) => doctor._id === selectedDoctor)||null
-  const selectedTimeSlotData = timeSlots.find((slot) => slot.id === selectedTimeSlot)
+  //const selectedTimeSlotData = timeSlots.find((slot) => slot.id === selectedTimeSlot)
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -381,7 +382,7 @@ export default function BookAppointmentPage() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm ">Time:</span>
-                        <span className="text-sm font-medium">{selectedTimeSlotData?.time}</span>
+                        <span className="text-sm font-medium">{selectedTimeSlot}</span>
                       </div>
                     </div>
 

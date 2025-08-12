@@ -3,7 +3,7 @@ import { Clock, Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } fr
 
 export function Footer() {
   return (
-    <footer className="bg-background border-t">
+    <footer className="max-w-7xl mx-auto bg-background border-t">
       <div className="container px-4 py-12 md:py-16 lg:py-20">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 ">
           <div className="flex flex-col justify-center items-center gap-2">

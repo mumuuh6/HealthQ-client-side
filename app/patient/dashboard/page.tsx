@@ -11,6 +11,7 @@ import { Calendar, Clock } from "lucide-react"
 import { useSession } from "next-auth/react"
 import UseAxiosNormal from "@/app/hook/UseAxiosNormal"
 import { useQuery } from "@tanstack/react-query"
+import { AppointmentDetailsModal } from "@/app/components/appointment-details-modal"
 
 // // Mock data for appointments
 // const upcomingAppointments = [
@@ -70,7 +71,17 @@ type Appointment = {
 export default function PatientDashboard() {
   const [activeTab, setActiveTab] = useState("upcoming")
   const { data: session } = useSession();
+    const [selectedAppointment, setSelectedAppointment] = useState<any>(null)
+const [isModalOpen, setIsModalOpen] = useState(false)
   const axiossecure = UseAxiosNormal();
+  
+  const handleViewDetails = (appointment: any) => {
+    setSelectedAppointment(appointment)
+    setIsModalOpen(true)
+  }
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+  }
   const { data: upcomingAppointments = [] } = useQuery({
     queryKey: ['patientAppointment', session?.user?.email],
     queryFn: async () => {
@@ -81,7 +92,7 @@ export default function PatientDashboard() {
     enabled: !!session?.user?.email,
   });
   const app = upcomingAppointments.find((app: Appointment) => app.queuePosition)
-  
+  //console.log('selectedAppointment', selectedAppointment)
   return (
     <div className="flex min-h-screen flex-col">
 
@@ -247,7 +258,7 @@ export default function PatientDashboard() {
                           </div>
                           <div className="flex flex-col md:items-end justify-center gap-2">
                             <Badge variant="secondary">Completed</Badge>
-                            <Button size="sm" variant="outline">
+                            <Button size="sm" variant="outline" onClick={() => handleViewDetails(appointment)}>
                               View Details
                             </Button>
                           </div>
@@ -260,6 +271,7 @@ export default function PatientDashboard() {
           </motion.div>
         </div>
       </main>
+      <AppointmentDetailsModal isOpen={isModalOpen} onClose={handleCloseModal} appointment={selectedAppointment} />
     </div>
   )
 }

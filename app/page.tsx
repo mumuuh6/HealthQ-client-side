@@ -7,7 +7,7 @@ import { Calendar, Clock, Users, User, CheckCircle } from "lucide-react"
 import Image from "next/image";
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="max-w-7xl mx-auto flex flex-col min-h-screen">
       <main className="flex-1">
         <section className="w-full py-5 lg:py-12">
           <div className="container px-4 md:px-6">
