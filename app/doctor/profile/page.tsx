@@ -94,7 +94,7 @@ const doctorProfile = {
 export default function DoctorProfilePage() {
   const axiossecure = UseAxiosNormal()
   const { doctorinfo:doctor, refetch } = useDoctors()
-  
+  //console.log("Doctor info:", doctor)
   const { data: session, update } = useSession()
   const [activeTab, setActiveTab] = useState("personal")
   const [isEditing, setIsEditing] = useState(false)

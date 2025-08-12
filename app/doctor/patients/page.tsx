@@ -252,11 +252,15 @@ export default function DoctorPatientsPage() {
                           <div className="mt-2 md:mt-0 flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
                             <div className="text-sm">
                               <div>
-                                <span>Last Visit:
+                                <span>
+                                  Last Visit:{" "}
                                   {patient?.date
-                                    ? new Date(patient.date).toLocaleDateString("en-GB")
+                                    ? new Date(patient.date) > new Date()
+                                      ? "Didn’t Visited yet"
+                                      : new Date(patient.date).toLocaleDateString("en-GB")
                                     : "Didn’t Visited yet"}
                                 </span>
+
                               </div>
                               <div>
                                 <span className="">Next: </span>

@@ -10,7 +10,7 @@ const useDoctors = () => {
   //console.log('session',session)
 //   console.log(session)
   const { data: doctorpatientinfo = [] } = useQuery({
-    queryKey: ['doctor', session?.user?.email],
+    queryKey: ['doctorpatientinfo', session?.user?.email],
     queryFn: async () => {
       const res = await axiossecure.get(`/find/role/${session?.user?.email}`);
       
@@ -32,7 +32,7 @@ const useDoctors = () => {
     queryFn: async () => {
         //console.log('email',session?.user?.email)
       const res = await axiossecure.get(`/signin/${session?.user?.email}`);
-       console.log('doctoinfo',res.data)
+       //console.log('doctoinfo',res.data)
       return res.data.userInfo;
     },
     enabled: status ==='authenticated' && !!session?.user?.email,
