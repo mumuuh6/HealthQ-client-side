@@ -64,7 +64,7 @@ export default function LoginPage() {
           })
           toast.success(`signin successful`);
           // Redirect to home page after successful login
-          nav.push(`${userInfo?.userType}/dashboard`);
+          nav.push(`/`);
         }
         else if (!res?.data?.status) {
           console.error("Login failed");

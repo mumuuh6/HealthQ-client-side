@@ -15,22 +15,24 @@ import { useRouter } from "next/navigation"
 export function Navbar() {
   const router = useRouter()
   const pathname = usePathname()
+
   const { data: session, status } = useSession();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  // const [role, setrole] = useState('');
-  // const axiosinstance = UseAxiosNormal();
-  // useEffect(() => {
-  //   const fetchUserRole = async () => {
-  //     try {
-  //       const response = await axiosinstance.get(`/find/role/${session?.user?.email}`);
-  //       setrole(response.data.role);
-  //     } catch (error) {
-  //       console.error('Error fetching user role:', error);
-  //     }
-  //   };
-  //   fetchUserRole();
-  // }, [session?.user?.email, axiosinstance])
+  const [role, setrole] = useState('patient');
+  const axiosinstance = UseAxiosNormal();
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      try {
+        const response = await axiosinstance.get(`/signin/${session?.user?.email}`);
+        //console.log('user role', response.data?.userInfo?.userType);
+        setrole(response.data?.userInfo?.userType);
+      } catch (error) {
+        console.error('Error fetching user role:', error);
+      }
+    };
+    fetchUserRole();
+  }, [session?.user?.email, axiosinstance])
   // Define navigation items
   const navItems = [
     { name: "Home", href: "/" },
@@ -40,7 +42,7 @@ export function Navbar() {
     { name: "About Us", href: "/about" },
     {
       name: "Dashboard",
-      href:  "/patient/dashboard"
+      href:  `/${role}/dashboard`,
     },
     { name: "Melanoma Screening", href: "/melanoma-screening" },
 
