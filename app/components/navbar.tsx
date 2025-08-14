@@ -45,6 +45,7 @@ export function Navbar() {
       href:  `/${role}/dashboard`,
     },
     { name: "Melanoma Screening", href: "/melanoma-screening" },
+    { name: "Buy Medicine", href: "/medicines" },
 
 
   ]
@@ -59,7 +60,7 @@ export function Navbar() {
 
   return (
     <header className="max-w-7xl mx-auto sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 md:px-6">
-      <div className=" flex h-16 items-center justify-between">
+      <div className=" flex h-16 items-center justify-around">
         <Link href="/" className="flex items-center gap-2 font-semibold">
           <motion.div initial={{ rotate: -10 }} animate={{ rotate: 0 }} transition={{ duration: 0.5 }}>
             <Clock className="h-6 w-6 text-primary" />
