@@ -107,7 +107,7 @@ export default function MedicinesPage() {
   // Compute categories only after medicines are loaded
 const categories: string[] = useMemo(() => {
   if (!Medicines) return ["all"];
-  return ["all", ...Array.from(new Set(Medicines.map((m: any) => m.category_slug))).map(String)];
+  return ["all", ...Array.from(new Set(Medicines.map((m: Categoryslug) => m.category_slug))).map(String)];
 }, [Medicines]);
 
 
