@@ -34,7 +34,7 @@ export default function MedicineDetailPage() {
   const [selectedUnit, setSelectedUnit] = useState(0)
   const [quantity, setQuantity] = useState(1)
     const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug
-    const { PerMedicineInfo: medicine,isLoading } = useMedicines(slug)
+    const { PerMedicineInfo: medicine,isPerMedicineLoading } = useMedicines(slug)
     //console.log("Medicines", Medicines)
 //   useEffect(() => {
 //     const foundMedicine = Medicines.find((m) => m.slug === params.slug)
@@ -42,14 +42,14 @@ export default function MedicineDetailPage() {
 //       setMedicine(foundMedicine)
 //     }
 //   }, [params.slug])
-    if (isLoading) {
+    if (isPerMedicineLoading|| !medicine.unit_prices || medicine.unit_prices.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
         <p>Loading medicine details...</p>
       </div>
     )
   }
-  if (!medicine) {
+  if (!medicine ) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
@@ -63,9 +63,9 @@ export default function MedicineDetailPage() {
     )
   }
 
-  const selectedPrice = medicine.unit_prices[selectedUnit]
+const selectedPrice = medicine.unit_prices[selectedUnit] || { price: 0, unit: "", unit_size: 0 };
   const totalPrice = selectedPrice.price * quantity
-  const discountedPrice = medicine.is_discountable
+  const discountedPrice = medicine?.is_discountable
     ? medicine.discount_type === "Percentage"
       ? totalPrice - (totalPrice * medicine.discount_value) / 100
       : totalPrice - medicine.discount_value

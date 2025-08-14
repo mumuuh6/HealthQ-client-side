@@ -45,7 +45,7 @@ const ITEMS_PER_PAGE = 10
 export default function MedicinesPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { medicineinfo: Medicines = [], isLoading } = useMedicines()
+  const { medicineinfo: Medicines = [], isMedicineLoading } = useMedicines()
 
   const [searchTerm, setSearchTerm] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
@@ -73,46 +73,39 @@ export default function MedicinesPage() {
   }, [Medicines, searchTerm, categoryFilter])
 
   // Pagination calculations
-  const totalPages = Math.ceil(filteredMedicines.length / ITEMS_PER_PAGE)
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
-  const endIndex = startIndex + ITEMS_PER_PAGE
-  const currentMedicines = filteredMedicines.slice(startIndex, endIndex)
-    if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <m.div
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3 }}
-          className="text-2xl font-semibold text-muted-foreground"
-        >
-          Loading Medicines...
-        </m.div>
-      </div>
-    )
-  }
-  // Handle page changes
-  const handlePageChange = (page: number) => {
-    if (page < 1 || page > totalPages) return
-    setCurrentPage(page)
-    router.push(`/medicines?page=${page}`)
-  }
+const totalPages = Math.ceil(filteredMedicines.length / ITEMS_PER_PAGE)
+const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+const endIndex = startIndex + ITEMS_PER_PAGE
+const currentMedicines = filteredMedicines.slice(startIndex, endIndex)
 
-  const handleMedicineClick = (medicine: Medicine) => {
-    router.push(`/medicines/${medicine.slug}`)
-  }
-
-  const getLowestPrice = (unitPrices: UnitPrice[]) => Math.min(...unitPrices.map((u) => u.price))
-
-  // Compute categories only after medicines are loaded
+// Compute categories only after medicines are loaded
 const categories: string[] = useMemo(() => {
   if (!Medicines) return ["all"];
   return ["all", ...Array.from(new Set(Medicines.map((m: Categoryslug) => m.category_slug))).map(String)];
 }, [Medicines]);
 
 
+if (isMedicineLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <p>Loading medicines...</p>
+      </div>
+    )
+  }
+// Handle page changes
+const handlePageChange = (page: number) => {
+  if (page < 1 || page > totalPages) return
+  setCurrentPage(page)
+  router.push(`/medicines?page=${page}`)
+}
 
-  console.log('categories', categories)
+const handleMedicineClick = (medicine: Medicine) => {
+  router.push(`/medicines/${medicine.slug}`)
+}
+
+const getLowestPrice = (unitPrices: UnitPrice[]) => Math.min(...unitPrices.map((u) => u.price))
+
+console.log('categories', categories)
 
 
   return (

@@ -8,7 +8,7 @@ const useMedicines = (slug?: string) => {
   const { data: session, status } = useSession();
 
   // Fetch all medicines
-  const { data: medicineinfo = [], refetch, isLoading } = useQuery({
+  const { data: medicineinfo = [], refetch, isLoading:isMedicineLoading } = useQuery({
     queryKey: ['medicineinfo', session?.user?.email],
     queryFn: async () => {
       const res = await axiossecure.get(`medicines`);
@@ -18,7 +18,7 @@ const useMedicines = (slug?: string) => {
   });
 
   // Fetch a single medicine dynamically if slug is provided
-  const { data: PerMedicineInfo = [] } = useQuery({
+  const { data: PerMedicineInfo = [],isLoading:isPerMedicineLoading } = useQuery({
     queryKey: ['PerMedicine', slug], // add slug to query key
     queryFn: async () => {
       if (!slug) return null; // avoid calling API if no slug
@@ -28,7 +28,7 @@ const useMedicines = (slug?: string) => {
     enabled: !!slug, // only fetch if slug exists
   });
 
-  return { medicineinfo, PerMedicineInfo, refetch, isLoading };
+  return { medicineinfo, PerMedicineInfo, refetch, isPerMedicineLoading,isMedicineLoading };
 };
 
 export default useMedicines;
