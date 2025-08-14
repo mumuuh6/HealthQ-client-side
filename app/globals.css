@@ -106,7 +106,7 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --muted: oklch(50% 0.05 150);
-  --muted-foreground: oklch(25% 0.02 150);
+  --muted-foreground: oklch(75% 0.02 150);;
   --foreground: oklch(85% 0.05 155);
   --card: oklch(15% 0.05 160);
   --card-foreground: oklch(90% 0.05 160);
