@@ -105,7 +105,7 @@ const handleMedicineClick = (medicine: Medicine) => {
 
 const getLowestPrice = (unitPrices: UnitPrice[]) => Math.min(...unitPrices.map((u) => u.price))
 
-console.log('categories', categories)
+//console.log('categories', categories)
 
 
   return (
