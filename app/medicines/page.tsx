@@ -105,10 +105,11 @@ export default function MedicinesPage() {
   const getLowestPrice = (unitPrices: UnitPrice[]) => Math.min(...unitPrices.map((u) => u.price))
 
   // Compute categories only after medicines are loaded
-const categories: string[] = useMemo(
-  () => ["all", ...Array.from(new Set(Medicines.map((m: any) => m.category_slug))).map(String)],
-  [Medicines]
-);
+const categories: string[] = useMemo(() => {
+  if (!Medicines) return ["all"];
+  return ["all", ...Array.from(new Set(Medicines.map((m: any) => m.category_slug))).map(String)];
+}, [Medicines]);
+
 
 
   console.log('categories', categories)
