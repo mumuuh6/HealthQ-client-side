@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Upload, Save, Lock } from "lucide-react"
+import { Upload, Save} from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import UseAxiosNormal from "@/app/hook/UseAxiosNormal"
 import { useSession } from "next-auth/react"
@@ -35,11 +35,11 @@ const dayMapReverse: Record<number, string> = {
   6: "Saturday",
   7: "Sunday",
 };
-interface Education {
-                        degree: string;
-                        institution: string;
-                        year: string;
-                      }
+// interface Education {
+//                         degree: string;
+//                         institution: string;
+//                         year: string;
+//                       }
 // interface Certification {
 //                         name: string;
 //                         issuer: string;
@@ -110,10 +110,10 @@ export default function DoctorProfilePage() {
       ...profile,
       availableDays: daysArray.length > 0 ? daysArray : [],
     }
-    //console.log("Updated profile data:", updatedProfile)
+    
     // In a real app, you would save the profile data to your backend here
     try {
-      const res = await axiossecure.patch(`/profile/${session?.user?.email}`, profile);
+      const res = await axiossecure.patch(`/profile/${session?.user?.email}`, updatedProfile);
 
       if (res?.data?.result?.modifiedCount > 0) {
         Swal.fire({
@@ -134,7 +134,6 @@ export default function DoctorProfilePage() {
   //console.log("Profile data:", JSON.stringify(profile, null, 2))
   return (
     <div className="flex min-h-screen flex-col">
-
       <main className="flex-1 p-4 md:p-6 bg-muted/40">
         <div className="mx-auto max-w-4xl space-y-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -162,16 +161,16 @@ export default function DoctorProfilePage() {
               <CardHeader className="pb-4">
                 <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
                   <div className="relative">
-                    {/* <Avatar className="h-24 w-24">
-                      <AvatarImage src="https://images.app.goo.gl/3wWrAmJDAEVYkPZy9" alt={profile.name} />
+                    <Avatar className="h-24 w-24">
+                      <AvatarImage src="https://images.app.goo.gl/3wWrAmJDAEVYkPZy9" alt={doctor?.name} />
                       <AvatarFallback className="text-2xl">
-                        {profile.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
+                        {doctor?.name ? doctor.name.
+                          split(" ")
+                          .map((n:string) => n[0])
+                          .join(""):"NA"}
                       </AvatarFallback>
-                    </Avatar> */}
-                    {/* {isEditing && (
+                    </Avatar>
+                    {isEditing && (
                       <Button
                         size="icon"
                         variant="outline"
@@ -180,11 +179,11 @@ export default function DoctorProfilePage() {
                         <Upload className="h-4 w-4" />
                         <span className="sr-only">Upload avatar</span>
                       </Button>
-                    )} */}
+                    )}
                   </div>
                   <div>
-                    <CardTitle className="text-2xl">{doctor.name}</CardTitle>
-                    <CardDescription className="text-lg">{doctor.specialty}</CardDescription>
+                    <CardTitle className="text-2xl">{doctor?.name}</CardTitle>
+                    <CardDescription className="text-lg">{doctor?.specialty}</CardDescription>
                   </div>
                 </div>
               </CardHeader>

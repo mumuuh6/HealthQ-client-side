@@ -16,7 +16,7 @@ export default function PatientLayout({ children }: { children: React.ReactNode 
 
   return (
     <div>
-        <header className="sticky top-0 z-10 flex h-16 justify-center items-center gap-4 border-b bg-background px-4 sm:px-6">
+        <header className="max-w-7xl mx-auto sticky top-0 z-10 flex h-16 justify-center items-center gap-4 border-b bg-background px-4 sm:px-6">
                 <Sheet>
                   <SheetTrigger asChild>
                     <Button variant="outline" size="icon" className="md:hidden">

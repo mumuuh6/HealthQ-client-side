@@ -1,13 +1,13 @@
 "use client"
 
-import { use, useState } from "react"
+import {  useState } from "react"
 import { motion } from "framer-motion"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Search, Plus, ChevronRight } from "lucide-react"
+import { Search} from "lucide-react"
 
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -244,7 +244,7 @@ export default function DoctorPatientsPage() {
                                 <span>{patient._id}</span>
                                 <span>•</span>
                                 <span>
-                                  {patient.age} • {patient.gender}
+                                  {patient.age} • {patient.gender.toUpperCase()}
                                 </span>
                               </div>
                             </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import {  useState } from "react"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
-import {  ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 
@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils"
 import { useSession } from "next-auth/react"
 import UseAxiosNormal from "@/app/hook/UseAxiosNormal"
 import useDoctors from "@/app/hook/useDoctors"
+import usePatients from "@/app/hook/usePatient"
 
 
 
@@ -76,14 +77,15 @@ interface Doctor {
 export default function BookAppointmentPage() {
   const router = useRouter()
   const [step, setStep] = useState(1)
-  const {data:session}=useSession();
+  const { data: session } = useSession();
   const [selectedDoctor, setSelectedDoctor] = useState<string | null>(null)
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState<number | string|null>(null)
-  const axiossecure=UseAxiosNormal();
-  const {roleinfo:doctors}=useDoctors();
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<number | string | null>(null)
+  const axiossecure = UseAxiosNormal();
+  const { roleinfo: doctors } = useDoctors();
+  const { patientinfo } = usePatients();
+  //console.log("Patient Info:", patientinfo, "Doctors Data:", doctors);
 
-  
   const form = useForm<AppointmentFormValues>({
     defaultValues: {
       doctorId: '',
@@ -97,7 +99,7 @@ export default function BookAppointmentPage() {
 
 
   const handleDoctorSelect = (doctorId: string) => {
-    
+
     setSelectedDoctor(doctorId)
     form.setValue("doctorId", doctorId)
     setStep(2)
@@ -109,9 +111,9 @@ export default function BookAppointmentPage() {
     setStep(3)
   }
 
-  const handleTimeSelect = (timeSlotId: number|string) => {
+  const handleTimeSelect = (timeSlotId: number | string) => {
     setSelectedTimeSlot(timeSlotId)
-    
+
     form.setValue("timeSlotId", timeSlotId)
     setStep(4)
   }
@@ -122,12 +124,12 @@ export default function BookAppointmentPage() {
     }
   }
 
-  const onSubmit = async(data: AppointmentFormValues) => {
+  const onSubmit = async (data: AppointmentFormValues) => {
     // In a real app, you would submit the appointment data to your backend here
-    const selectedDoctorDataa = doctors.find((doctor:Doctor) => doctor._id === data.doctorId)||null
-    
+    const selectedDoctorDataa = doctors.find((doctor: Doctor) => doctor._id === data.doctorId) || null
+    //console.log("Selected Doctor Data:", selectedDoctorDataa);
     setSelectedTimeSlot(data.timeSlotId)
-    const payload={
+    const payload = {
       doctorId: selectedDoctorDataa._id,
       date: data.date,
       timeSlotId: data.timeSlotId,
@@ -137,8 +139,13 @@ export default function BookAppointmentPage() {
       specialty: selectedDoctorDataa.specialty,
       status: "upcoming",
       email: session?.user?.email,
+      docotorEmail: selectedDoctorDataa.email,
+      patientName: patientinfo.name,
+      age: patientinfo.age,
+      gender: patientinfo.gender
+
     }
-    
+    console.log('payload',payload)
     const res=await axiossecure.post('/book-appointment', payload);
     if(res?.data?.data?.insertedId){
     // Show success message
@@ -154,7 +161,7 @@ export default function BookAppointmentPage() {
 
   }
 
-  const selectedDoctorData = doctors.find((doctor:Doctor) => doctor._id === selectedDoctor)||null
+  const selectedDoctorData = doctors.find((doctor: Doctor) => doctor._id === selectedDoctor) || null
   //const selectedTimeSlotData = timeSlots.find((slot) => slot.id === selectedTimeSlot)
 
   return (
@@ -239,41 +246,41 @@ export default function BookAppointmentPage() {
                   <CardDescription>Choose a healthcare provider for your appointment</CardDescription>
                 </CardHeader>
                 <CardContent className="grid gap-4">
-                  {doctors.length==0?(<>No doctor available</>):(
-                    doctors.map((doctor:Doctor) => (
-                    <div
-                      key={doctor._id}
-                      className={cn(
-                        "flex items-center justify-between p-4 rounded-lg border cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors",
-                        selectedDoctor === doctor._id && "border-primary bg-primary/5",
-                      )}
-                      onClick={() => handleDoctorSelect(doctor._id)}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="rounded-full bg-muted p-2">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="h-5 w-5"
-                          >
-                            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-                          </svg>
+                  {doctors.length == 0 ? (<>No doctor available</>) : (
+                    doctors.map((doctor: Doctor) => (
+                      <div
+                        key={doctor._id}
+                        className={cn(
+                          "flex items-center justify-between p-4 rounded-lg border cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors",
+                          selectedDoctor === doctor._id && "border-primary bg-primary/5",
+                        )}
+                        onClick={() => handleDoctorSelect(doctor._id)}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="rounded-full bg-muted p-2">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="h-5 w-5"
+                            >
+                              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="font-medium">{doctor.name}</p>
+                            <p className="text-sm ">{doctor.specialty}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium">{doctor.name}</p>
-                          <p className="text-sm ">{doctor.specialty}</p>
-                        </div>
+                        <ChevronRight className="h-5 w-5 " />
                       </div>
-                      <ChevronRight className="h-5 w-5 " />
-                    </div>
-                  ))
+                    ))
                   )}
                 </CardContent>
               </Card>
@@ -300,14 +307,14 @@ export default function BookAppointmentPage() {
                     mode="single"
                     selected={selectedDate}
                     onSelect={handleDateSelect}
-                    disabled={(date) => { 
+                    disabled={(date) => {
                       // Disable past dates
                       const isPastDate = date < new Date(new Date().setHours(0, 0, 0, 0))
                       // Disable weekends
-                      const isWeekend =  date.getDay() === 5
+                      const isWeekend = date.getDay() === 5
                       // Disable dates not available for the selected doctor
-                      const isNotAvailableForDoctor = !selectedDoctorData?.availableDays||
-                      !selectedDoctorData.availableDays.includes(date.getDay());
+                      const isNotAvailableForDoctor = !selectedDoctorData?.availableDays ||
+                        !selectedDoctorData.availableDays.includes(date.getDay());
 
                       return isPastDate || isWeekend || isNotAvailableForDoctor
                     }}

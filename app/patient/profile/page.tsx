@@ -96,7 +96,7 @@ export default function PatientProfilePage() {
   const isLoading = status === "loading";
 
   const calculateAge = (dob:string) => {
-    console.log("Calculating age for date of birth:", dob);
+    
     if (!dob) return "";
     const birthDate = new Date(dob);
     const today = new Date();

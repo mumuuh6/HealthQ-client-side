@@ -3,16 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { useSession } from "next-auth/react";
 import UseAxiosNormal from "@/app/hook/UseAxiosNormal"
-// type Appointment = {
-//   doctorId: number
-//   doctor: string
-//   specialty: string
-//   date: Date
-//   time: string
-//   status: "upcoming" | "completed" | "cancelled"
-//   location?: string
-//   notes: string
-// }
+
 const usePatients = () => {
   const axiossecure = UseAxiosNormal();
   const {data:session} = useSession();
