@@ -121,8 +121,8 @@ export default function DoctorDashboard() {
       text: "This will move to the next patient in the queue",
       icon: "question",
       showCancelButton: true,
-      confirmButtonColor: "hsl(var(--primary))",
-      cancelButtonColor: "hsl(var(--muted))",
+      confirmButtonColor: "var(--primary)",
+      cancelButtonColor: "var(--muted)",
       confirmButtonText: "Yes, complete",
     }).then((result) => {
       if (result.isConfirmed) {
@@ -132,7 +132,7 @@ export default function DoctorDashboard() {
           title: "Next patient called",
           text: "Emily Johnson is now being called",
           icon: "success",
-          confirmButtonColor: "hsl(var(--primary))",
+          confirmButtonColor: "var(--primary)",
         })
       }
     })

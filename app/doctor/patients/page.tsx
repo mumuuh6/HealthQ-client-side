@@ -163,7 +163,7 @@ export default function DoctorPatientsPage() {
   // Filter patients based on search query and active tab
   const filteredPatients = patients.filter((patient: Patient) => {
     const matchesSearch =
-      patient.patientName.toLowerCase().includes(searchQuery.toLowerCase())
+      patient?.patientName?.toLowerCase().includes(searchQuery.toLowerCase())
 
     if (activeTab === "all") return matchesSearch
     if (activeTab === "active") return matchesSearch && patient.status === "active"

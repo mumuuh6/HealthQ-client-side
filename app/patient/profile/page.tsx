@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {  Upload, Save} from "lucide-react"
+import { Upload, Save } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useSession } from "next-auth/react"
@@ -30,88 +30,100 @@ import UseAxiosNormal from "@/app/hook/UseAxiosNormal"
 import Swal from "sweetalert2"
 import usePatients from "@/app/hook/usePatient"
 
-// Mock patient profile data
-// const patientProfile = {
-//   name: "John Doe",
-//   email: "john.doe@example.com",
-//   phone: "(555) 123-4567",
-//   dateOfBirth: "1985-06-15",
-//   gender: "male",
-//   address: "123 Main St, Apt 4B, New York, NY 10001",
-//   emergencyContact: {
-//     name: "Jane Doe",
-//     relationship: "Spouse",
-//     phone: "(555) 987-6543",
-//   },
-//   medicalInfo: {
-//     allergies: "Penicillin, Peanuts",
-//     medications: "Lisinopril 10mg daily, Atorvastatin 20mg daily",
-//     conditions: "Hypertension, High Cholesterol",
-//     bloodType: "O+",
-//   },
-//   insurance: {
-//     provider: "Blue Cross Blue Shield",
-//     policyNumber: "XYZ123456789",
-//     groupNumber: "GRP987654",
-//     primaryHolder: "Self",
-//   },
-// }
+
+
 
 export default function PatientProfilePage() {
-
+  const { data: session, status, update } = useSession();
+  const axiossecure = UseAxiosNormal()
+  const { patientinfo: patient, refetch } = usePatients();
   const [activeTab, setActiveTab] = useState("personal")
   const [isEditing, setIsEditing] = useState(false)
+  // type PatientProfile = {
+  //   name: string
+  //   email: string
+  //   phone: string
+  //   dateOfBirth: string
+  //   gender: string
+  //   age?: number | string
+  //   address: string
+  //   emergencyContact?: {
+  //     name?: string
+  //     relationship?: string
+  //     phone?: string
+  //   }
+  //   medicalInfo?: {
+  //     allergies?: string
+  //     medications?: string
+  //     conditions?: string
+  //     bloodType?: string
+  //   }
+  //   // insurance?: {
+  //   //   provider?: string
+  //   //   policyNumber?: string
+  //   //   groupNumber?: string
+  //   //   primaryHolder?: string
+  //   // }
+  //   [key: string]: any
+  // }
 
-  const { data: session, status,update } = useSession();
-  const axiossecure=UseAxiosNormal()
-  const {patientinfo:patient,refetch}=usePatients();
-  const isLoading = status === "loading";
-  
-  const [patientProfile, setPatientProfile] = useState({
-    name: '',
-    email: '',
+  const [profile, setProfile] = useState({
+  name: "",
+  email: "",
+  phone: "",
+  dateOfBirth: "",
+  gender: "",
+  age: "",
+  address: "",
+  emergencyContact: {
+    name: "",
+    relationship: "",
     phone: "",
-    dateOfBirth: "",
-    gender: "male",
-    address: "",
-    emergencyContact: {
-      name: "",
-      relationship: "",
-      phone: "",
-    },
-    medicalInfo: {
-      allergies: "",
-      medications: "",
-      conditions: "",
-      bloodType: "",
-    },
-    insurance: {
-      provider: "",
-      policyNumber: "",
-      groupNumber: "",
-      primaryHolder: "",
-    },
-  });
+  },
+  medicalInfo: {
+    allergies: "",
+    medications: "",
+    conditions: "",
+    bloodType: "",
+  },
+  insurance: {
+    provider: "",
+    policyNumber: "",
+    groupNumber: "",
+    primaryHolder: "",
+  },
+})
+  const isLoading = status === "loading";
+
+  const calculateAge = (dob:string) => {
+    console.log("Calculating age for date of birth:", dob);
+    if (!dob) return "";
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
 
   useEffect(() => {
-    
-    refetch()
-  }, []);
-  const [profile, setProfile] = useState(patientProfile)
-  useEffect(() => {
-  if (patient) {
-    setPatientProfile(patient);
-    setProfile(patient);
-  }
-}, [patient]);
-  if (isLoading) return ;
+    if (isEditing && patient) {
+      
+      setProfile({
+        ...patient,
+        age: calculateAge(patient.dateOfBirth),
+      })
+    }
+  }, [isEditing, patient]);
+  if (isLoading) return <div>Loading...</div>;
 
+  const handleSaveProfile = async () => {
 
-   const handleSaveProfile =async () => {
-    
-    try{
-      const res=await axiossecure.patch(`/profile/${session?.user?.email}`,profile);
-      if(res?.data?.result?.modifiedCount > 0){
+    try {
+      const res = await axiossecure.patch(`/profile/${session?.user?.email}`, profile);
+      if (res?.data?.result?.modifiedCount > 0) {
         Swal.fire({
           title: "Profile Updated Successfully",
           icon: "success",
@@ -119,14 +131,15 @@ export default function PatientProfilePage() {
         await update();
       }
       await refetch();
+      setIsEditing(false)
     }
-    catch(error){
+    catch (error) {
       console.error("Error saving profile:", error);
-      
+
     }
-    setIsEditing(false)
-    // Show success message
+
   }
+  
   return (
     <div className="flex min-h-screen flex-col">
       <main className="flex-1 p-4 md:p-6 bg-muted/40">
@@ -157,13 +170,13 @@ export default function PatientProfilePage() {
                 <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
                   <div className="relative">
                     <Avatar className="h-24 w-24">
-                      <AvatarImage src="https://images.app.goo.gl/3wWrAmJDAEVYkPZy9" alt={profile.name} />
-                      {/* <AvatarFallback className="text-2xl">
-                        {profile.name
+                      <AvatarImage src="https://images.app.goo.gl/3wWrAmJDAEVYkPZy9" alt={profile?.name||''} />
+                      <AvatarFallback className="text-2xl">
+                        {profile?.name
                           .split(" ")
                           .map((n) => n[0])
                           .join("")}
-                      </AvatarFallback> */}
+                      </AvatarFallback>
                     </Avatar>
                     {isEditing && (
                       <Button
@@ -198,8 +211,8 @@ export default function PatientProfilePage() {
                             <Label htmlFor="name">Full Name</Label>
                             <Input
                               id="name"
-                              value={profile.name}
-                              placeholder={patient.name}
+                              value={profile?.name || ''}
+                              placeholder={patient?.name}
                               onChange={(e) => setProfile({ ...profile, name: e.target.value })}
                             />
                           </div>
@@ -208,7 +221,7 @@ export default function PatientProfilePage() {
                             <Input
                               id="email"
                               type="email"
-                              value={profile.email}
+                              value={profile?.email}
                               placeholder={patient.email}
                               readOnly
                             />
@@ -217,7 +230,7 @@ export default function PatientProfilePage() {
                             <Label htmlFor="phone">Phone</Label>
                             <Input
                               id="phone"
-                              value={profile.phone}
+                              value={profile?.phone}
                               placeholder={patient.phone}
                               onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
                             />
@@ -227,7 +240,7 @@ export default function PatientProfilePage() {
                             <Input
                               id="dob"
                               type="date"
-                              value={profile.dateOfBirth}
+                              value={profile?.dateOfBirth}
                               onChange={(e) => setProfile({ ...profile, dateOfBirth: e.target.value })}
                             />
                           </div>
@@ -235,7 +248,7 @@ export default function PatientProfilePage() {
                         <div className="space-y-2">
                           <Label>Gender</Label>
                           <RadioGroup
-                            value={profile.gender}
+                            value={profile?.gender}
                             onValueChange={(value) => setProfile({ ...profile, gender: value })}
                             className="flex gap-4"
                           >
@@ -257,10 +270,16 @@ export default function PatientProfilePage() {
                           <Label htmlFor="address">Address</Label>
                           <Input
                             id="address"
-                            value={profile.address}
+                            value={profile?.address}
                             placeholder={patient.address}
                             onChange={(e) => setProfile({ ...profile, address: e.target.value })}
                           />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="age">Age</Label>
+                          <Input id="age"
+                            value={profile?.age}
+                            readOnly />
                         </div>
                         <div className="space-y-2">
                           <h3 className="text-lg font-medium">Emergency Contact</h3>
@@ -269,7 +288,7 @@ export default function PatientProfilePage() {
                               <Label htmlFor="emergency-name">Name</Label>
                               <Input
                                 id="emergency-name"
-                                value={profile.emergencyContact?.name}
+                                value={profile?.emergencyContact?.name}
                                 placeholder={patient.emergencyContact?.name}
                                 onChange={(e) =>
                                   setProfile({
@@ -286,7 +305,7 @@ export default function PatientProfilePage() {
                               <Label htmlFor="emergency-relationship">Relationship</Label>
                               <Input
                                 id="emergency-relationship"
-                                value={profile.emergencyContact?.relationship}
+                                value={profile?.emergencyContact?.relationship}
                                 placeholder={patient.emergencyContact?.relationship}
                                 onChange={(e) =>
                                   setProfile({
@@ -303,7 +322,7 @@ export default function PatientProfilePage() {
                               <Label htmlFor="emergency-phone">Phone</Label>
                               <Input
                                 id="emergency-phone"
-                                value={profile.emergencyContact?.phone}
+                                value={profile?.emergencyContact?.phone}
                                 placeholder={patient.emergencyContact?.phone}
                                 onChange={(e) =>
                                   setProfile({
@@ -337,14 +356,24 @@ export default function PatientProfilePage() {
                               <p>{new Date(patient.dateOfBirth).toLocaleDateString()}</p>
                             </div>
                             <div>
-                              <p className="text-sm ">Gender</p>
-                              <p>{patient.gender?patient.gender.charAt(0).toUpperCase() + profile.gender?.slice(1):"Not"}</p>
+                            <p className="text-sm">Gender</p>
+                              <p>
+                                {patient?.gender
+                                  ? patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1)
+                                  : "Not Provided"}
+                              </p>
+
+                            </div>
+                            <div>
+                              <p className="text-sm ">Address</p>
+                              <p>{patient.address}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm ">Age</p>
+                              <p>{patient.age || 'Birthdate not provided'}</p>
                             </div>
                           </div>
-                          <div>
-                            <p className="text-sm ">Address</p>
-                            <p>{patient.address}</p>
-                          </div>
+
                         </div>
                         <Separator />
                         <div className="space-y-3">
@@ -374,8 +403,8 @@ export default function PatientProfilePage() {
                           <Label htmlFor="allergies">Allergies</Label>
                           <Textarea
                             id="allergies"
-                            value={profile.medicalInfo?.allergies}
-                            placeholder={patient.medicalInfo?.allergies || "None"}
+                            value={profile?.medicalInfo?.allergies}
+                            placeholder={patient?.medicalInfo?.allergies || "None"}
                             onChange={(e) =>
                               setProfile({
                                 ...profile,
@@ -388,8 +417,8 @@ export default function PatientProfilePage() {
                           <Label htmlFor="medications">Current Medications</Label>
                           <Textarea
                             id="medications"
-                            value={profile.medicalInfo.medications}
-                            placeholder={patient.medicalInfo?.medications || "None"}
+                            value={profile?.medicalInfo?.medications}
+                            placeholder={patient?.medicalInfo?.medications || "None"}
                             onChange={(e) =>
                               setProfile({
                                 ...profile,
@@ -402,7 +431,7 @@ export default function PatientProfilePage() {
                           <Label htmlFor="conditions">Medical Conditions</Label>
                           <Textarea
                             id="conditions"
-                            value={profile.medicalInfo?.conditions}
+                            value={profile?.medicalInfo?.conditions}
                             placeholder={patient.medicalInfo?.conditions || "None"}
                             onChange={(e) =>
                               setProfile({
@@ -415,7 +444,7 @@ export default function PatientProfilePage() {
                         <div className="space-y-2">
                           <Label htmlFor="blood-type">Blood Type</Label>
                           <Select
-                            value={profile.medicalInfo.bloodType}
+                            value={profile?.medicalInfo?.bloodType}
                             onValueChange={(value) =>
                               setProfile({
                                 ...profile,
@@ -444,28 +473,28 @@ export default function PatientProfilePage() {
                         <div className="space-y-3">
                           <div>
                             <p className="text-sm ">Allergies</p>
-                            <p>{patient.medicalInfo?.allergies || "None"}</p>
+                            <p>{patient?.medicalInfo?.allergies || "None"}</p>
                           </div>
                         </div>
                         <Separator />
                         <div className="space-y-3">
                           <div>
                             <p className="text-sm ">Current Medications</p>
-                            <p>{patient.medicalInfo?.medications || "None"}</p>
+                            <p>{patient?.medicalInfo?.medications || "None"}</p>
                           </div>
                         </div>
                         <Separator />
                         <div className="space-y-3">
                           <div>
                             <p className="text-sm ">Medical Conditions</p>
-                            <p>{patient.medicalInfo?.conditions || "None"}</p>
+                            <p>{patient?.medicalInfo?.conditions || "None"}</p>
                           </div>
                         </div>
                         <Separator />
                         <div className="space-y-3">
                           <div>
                             <p className="text-sm ">Blood Type</p>
-                            <p>{patient.medicalInfo?.bloodType || "Unknown"}</p>
+                            <p>{patient?.medicalInfo?.bloodType || "Unknown"}</p>
                           </div>
                         </div>
                       </div>
