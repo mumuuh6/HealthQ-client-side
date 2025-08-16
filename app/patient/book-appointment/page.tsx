@@ -148,17 +148,17 @@ export default function BookAppointmentPage() {
     const formattedDate = payload?.date
       ? (d => `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`)(new Date(payload.date))
       : "";
-    const formattedTime = (t) => `${String((h => h % 12 + (/PM/i.test(t) ? 12 : 0))(Number(t.split(':')[0]))).padStart(2, '0')}:${t.split(':')[1].split(' ')[0]}`;
-
+    const formattedTime = (t: string): string => `${String((h => h % 12 + (/PM/i.test(t) ? 12 : 0))(Number(t.split(':')[0]))).padStart(2, '0')}:${t.split(':')[1].split(' ')[0]}`;
+    console.log(payload.timeSlotId)
     const MeetPayload = {
       doctorEmail: payload.docotorEmail,
       patientEmail: payload.email,
       date: formattedDate,
-      time: formattedTime(payload.timeSlotId),
+      time: formattedTime(String(payload.timeSlotId)),
       summary: payload.reason,
     }
 
-    //console.log('payload', MeetPayload)
+    
     try {
       const res = await axiossecure.post('/api/google/create-event', MeetPayload);
       if (res?.data?.status) {
@@ -203,18 +203,7 @@ export default function BookAppointmentPage() {
       })
       return;
     }
-    // const res=await axiossecure.post('/book-appointment', payload);
-    // if(res?.data?.data?.insertedId){
-    // // Show success message
-    // Swal.fire({
-    //   title: "Appointment Booked!",
-    //   text: "Your appointment has been scheduled successfully.",
-    //   icon: "success",
-    //   confirmButtonColor: "hsl(var(--primary))",
-    // }).then(() => {
-    //   router.push("/patient/dashboard")
-    // })
-    // }
+    
 
   }
 
