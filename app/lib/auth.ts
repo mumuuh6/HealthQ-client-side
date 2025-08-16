@@ -16,7 +16,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         try {
           const res = await axios.post(
-            `https://health-q-tau.vercel.app/signin/${email}`,
+            `https://health-q-server.vercel.app/signin/${email}`,
             { email, password }
           );
           
@@ -48,7 +48,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     try {
 
       const res = await axios.get(
-        `https://health-q-tau.vercel.app/signin/${session?.user?.email}`
+        `https://health-q-server.vercel.app/signin/${session?.user?.email}`
       );
       const user = res.data?.userInfo;
       

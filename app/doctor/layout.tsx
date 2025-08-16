@@ -19,7 +19,7 @@ export default function DoctorLayout({ children }: { children: React.ReactNode }
     
     try{
       
-      window.location.href = `https://health-q-tau.vercel.app/auth/google?email=${encodeURIComponent(session?.user?.email ?? "")}&redirect=${encodeURIComponent(pathname)}`;
+      window.location.href = `https://health-q-server.vercel.app/auth/google?email=${encodeURIComponent(session?.user?.email ?? "")}&redirect=${encodeURIComponent(pathname)}`;
     }
     catch (error){
       console.error("Error during Google Auth:", error);
