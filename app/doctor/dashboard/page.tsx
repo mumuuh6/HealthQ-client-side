@@ -144,7 +144,7 @@ export default function DoctorDashboard() {
       <main className="flex-1 p-4 md:p-6 bg-muted/40">
         <div className="mx-auto max-w-6xl space-y-6">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Welcome, {session?.user?.name}</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Welcome, {session?.user?.name?.toUpperCase()}</h1>
             <p className="">Manage your patient queue and appointments</p>
           </div>
 

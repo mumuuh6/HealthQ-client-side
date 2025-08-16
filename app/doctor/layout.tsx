@@ -1,21 +1,33 @@
 "use client"
 
 import type React from "react"
-
+//import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Menu } from "lucide-react"
+import { useSession } from "next-auth/react"
 
 export default function DoctorLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  
+  const {data:session}=useSession()
   const isactive = (path: string) => pathname === path;
-
+  const handlegoogleauth = () => {
+    
+    try{
+      
+      window.location.href = `https://health-q-tau.vercel.app/auth/google?email=${encodeURIComponent(session?.user?.email ?? "")}&redirect=${encodeURIComponent(pathname)}`;
+    }
+    catch (error){
+      console.error("Error during Google Auth:", error);
+    }
+  }
   return (
     <div>
-        <header className="max-w-7xl mx-auto sticky top-0 z-10 flex h-16 justify-center items-center gap-4 border-b bg-background px-4 sm:px-6">
+      <header className="max-w-7xl mx-auto sticky top-0 z-10 flex h-16 justify-center items-center gap-4 border-b bg-background px-4 sm:px-6">
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="outline" size="icon" className="md:hidden">
@@ -23,9 +35,11 @@ export default function DoctorLayout({ children }: { children: React.ReactNode }
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
+
           <SheetContent side="left" className="w-64">
+            <h2 className="sr-only">Doctor Menu</h2>
+            
             <nav className="flex flex-col gap-4 py-4">
-              
               <div className="flex flex-col gap-2">
                 <Link
                   href="/doctor/dashboard"
@@ -51,11 +65,13 @@ export default function DoctorLayout({ children }: { children: React.ReactNode }
                 >
                   Profile
                 </Link>
+                <button className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-muted ${isactive("/doctor/profile") ? "bg-muted" : ""}`}
+                  onClick={handlegoogleauth}>Connect Google Calender</button>
               </div>
             </nav>
           </SheetContent>
         </Sheet>
-        
+
         <nav className="hidden md:flex items-center gap-5 text-sm font-medium">
           <Link href="/doctor/dashboard" className={`rounded-lg  px-3 py-2 hover:bg-muted ${isactive("/doctor/dashboard") ? "bg-muted" : ""}`}>
             Dashboard
@@ -69,8 +85,11 @@ export default function DoctorLayout({ children }: { children: React.ReactNode }
           <Link href="/doctor/profile" className={`rounded-lg px-3 py-2 hover:bg-muted ${isactive("/doctor/profile") ? "bg-muted" : ""}`}>
             Profile
           </Link>
+          <button className={`rounded-lg px-3 py-2 hover:bg-muted ${isactive("/doctor/profile") ? "bg-muted" : ""}`}
+                  onClick={handlegoogleauth}>Connect Google Calender</button>
+
         </nav>
-        
+
       </header>
       <div>
         {children}

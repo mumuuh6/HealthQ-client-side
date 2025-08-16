@@ -67,14 +67,15 @@ type Appointment = {
   notes: string
   estimatedWaitTime?: string
   queuePosition?: number
+  meetlink?: string
 }
 export default function PatientDashboard() {
   const [activeTab, setActiveTab] = useState("upcoming")
   const { data: session } = useSession();
-    const [selectedAppointment, setSelectedAppointment] = useState<any>(null)
-const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedAppointment, setSelectedAppointment] = useState<any>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const axiossecure = UseAxiosNormal();
-  
+
   const handleViewDetails = (appointment: any) => {
     setSelectedAppointment(appointment)
     setIsModalOpen(true)
@@ -93,6 +94,12 @@ const [isModalOpen, setIsModalOpen] = useState(false)
   });
   const app = upcomingAppointments.find((app: Appointment) => app.queuePosition)
   //console.log('selectedAppointment', selectedAppointment)
+  //console.log('upcomingAppointments', upcomingAppointments)
+  const isToday = (appointmentDate: string | Date): boolean => {
+  const today = new Date();
+  const date = new Date(appointmentDate);
+  return today.toDateString() === date.toDateString();
+};
   return (
     <div className="flex min-h-screen flex-col">
 
@@ -221,11 +228,18 @@ const [isModalOpen, setIsModalOpen] = useState(false)
                                 <Button size="sm" variant="outline">
                                   Join Queue
                                 </Button>
+                              ) : appointment.meetlink ? (
+                                <a href={`${appointment.meetlink}`} target="_blank"
+                                  rel="noopener noreferrer"><Button size="sm" variant="outline">
+                                    Join Consultation
+                                  </Button></a>
                               ) : (
                                 <Button size="sm" variant="outline" disabled>
                                   In Queue
                                 </Button>
-                              )}
+                              )
+
+                              }
                               <Button size="sm" variant="outline">
                                 Reschedule
                               </Button>

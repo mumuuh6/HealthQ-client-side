@@ -145,19 +145,76 @@ export default function BookAppointmentPage() {
       gender: patientinfo.gender
 
     }
-    console.log('payload',payload)
-    const res=await axiossecure.post('/book-appointment', payload);
-    if(res?.data?.data?.insertedId){
-    // Show success message
-    Swal.fire({
-      title: "Appointment Booked!",
-      text: "Your appointment has been scheduled successfully.",
-      icon: "success",
-      confirmButtonColor: "hsl(var(--primary))",
-    }).then(() => {
-      router.push("/patient/dashboard")
-    })
+    const formattedDate = payload?.date
+      ? (d => `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`)(new Date(payload.date))
+      : "";
+    const formattedTime = (t) => `${String((h => h % 12 + (/PM/i.test(t) ? 12 : 0))(Number(t.split(':')[0]))).padStart(2, '0')}:${t.split(':')[1].split(' ')[0]}`;
+
+    const MeetPayload = {
+      doctorEmail: payload.docotorEmail,
+      patientEmail: payload.email,
+      date: formattedDate,
+      time: formattedTime(payload.timeSlotId),
+      summary: payload.reason,
     }
+
+    //console.log('payload', MeetPayload)
+    try {
+      const res = await axiossecure.post('/api/google/create-event', MeetPayload);
+      if (res?.data?.status) {
+        const newPayload = {
+          ...payload,
+          meetlink: res.data.meetLink
+        }
+        //console.log('newPayload', newPayload)
+        try {
+          const res2 = await axiossecure.post('/book-appointment', newPayload);
+          if (res2?.data?.data?.insertedId) {
+            // Show success message
+            Swal.fire({
+              title: "Appointment Booked!",
+              text: "Your appointment has been scheduled successfully.",
+              icon: "success",
+              confirmButtonColor: "var(--primary)",
+            }).then(() => {
+              router.push("/patient/dashboard")
+            })
+          }
+        }
+        catch (error) {
+          console.error("Error creating appointment:", error);
+          Swal.fire({
+            title: "Error",
+            text: "Failed to create appointment. Please try again later.",
+            icon: "error",
+            confirmButtonColor: "var(--primary)",
+          })
+          return;
+        }
+      }
+    }
+    catch (error) {
+      console.error("Error booking appointment:", error);
+      Swal.fire({
+        title: "Error",
+        text: "Failed to book appointment. Please try again later.",
+        icon: "error",
+        confirmButtonColor: "var(--primary)",
+      })
+      return;
+    }
+    // const res=await axiossecure.post('/book-appointment', payload);
+    // if(res?.data?.data?.insertedId){
+    // // Show success message
+    // Swal.fire({
+    //   title: "Appointment Booked!",
+    //   text: "Your appointment has been scheduled successfully.",
+    //   icon: "success",
+    //   confirmButtonColor: "hsl(var(--primary))",
+    // }).then(() => {
+    //   router.push("/patient/dashboard")
+    // })
+    // }
 
   }
 
