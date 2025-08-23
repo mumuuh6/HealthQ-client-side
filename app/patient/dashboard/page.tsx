@@ -18,7 +18,7 @@ import { AppointmentDetailsModal } from "@/app/components/appointment-details-mo
 //   {
 //     id: 1,
 //     doctor: "Dr. Sarah Johnson",
-//     specialty: "Cardiologist",
+//     Doctor_Type: "Cardiologist",
 //     date: "2025-04-20",
 //     time: "10:00 AM",
 //     status: "confirmed",
@@ -28,7 +28,7 @@ import { AppointmentDetailsModal } from "@/app/components/appointment-details-mo
 //   {
 //     id: 2,
 //     doctor: "Dr. Michael Chen",
-//     specialty: "Dermatologist",
+//     Doctor_Type: "Dermatologist",
 //     date: "2025-04-25",
 //     time: "2:30 PM",
 //     status: "confirmed",
@@ -41,7 +41,7 @@ import { AppointmentDetailsModal } from "@/app/components/appointment-details-mo
 //   {
 //     id: 3,
 //     doctor: "Dr. Emily Wilson",
-//     specialty: "General Practitioner",
+//     Doctor_Type: "General Practitioner",
 //     date: "2025-04-01",
 //     time: "9:15 AM",
 //     status: "completed",
@@ -49,7 +49,7 @@ import { AppointmentDetailsModal } from "@/app/components/appointment-details-mo
 //   {
 //     id: 4,
 //     doctor: "Dr. James Rodriguez",
-//     specialty: "Orthopedic Surgeon",
+//     Doctor_Type: "Orthopedic Surgeon",
 //     date: "2025-03-15",
 //     time: "11:30 AM",
 //     status: "completed",
@@ -58,7 +58,7 @@ import { AppointmentDetailsModal } from "@/app/components/appointment-details-mo
 type Appointment = {
   _id: string
   doctor?: string | 'no name'
-  specialty?: string
+  Doctor_Type?: string
   date: string
   timeSlotId: number | string
   time: string
@@ -88,13 +88,13 @@ export default function PatientDashboard() {
     queryFn: async () => {
       const res = await axiossecure.get(`/booked-appointments/${session?.user?.email}`);
 
-      return res.data.data;
+      return res?.data?.data ||[];
     },
     enabled: !!session?.user?.email,
   });
   const app = upcomingAppointments.find((app: Appointment) => app.queuePosition)
-  //console.log('selectedAppointment', selectedAppointment)
-  //console.log('upcomingAppointments', upcomingAppointments)
+  ////console.log('selectedAppointment', selectedAppointment)
+  ////console.log('upcomingAppointments', upcomingAppointments)
   const isToday = (appointmentDate: string | Date): boolean => {
   const today = new Date();
   const date = new Date(appointmentDate);
@@ -134,7 +134,7 @@ export default function PatientDashboard() {
                       </div>
                       <div className="space-y-4 flex-1">
                         <div>
-                          <h3 className="font-medium">{app.doctor} - {app.specialty}</h3>
+                          <h3 className="font-medium">{app.doctor} - {app.Doctor_Type}</h3>
                           <p className="text-sm">
                             {new Date(app.date).toDateString() === new Date().toDateString()
                               ? `Today at ${app.timeSlotId}`
@@ -207,7 +207,7 @@ export default function PatientDashboard() {
                             </div>
                             <div>
                               <h3 className="font-medium">{appointment.doctor}</h3>
-                              <p className="text-sm ">{appointment.specialty}</p>
+                              <p className="text-sm ">{appointment.Doctor_Type}</p>
                               <p className="text-sm">
                                 {new Date(appointment.date).toLocaleDateString("en-US", {
                                   weekday: "long",
@@ -258,7 +258,7 @@ export default function PatientDashboard() {
                             </div>
                             <div>
                               <h3 className="font-medium">{appointment.doctor}</h3>
-                              <p className="text-sm ">{appointment.specialty}</p>
+                              <p className="text-sm ">{appointment.Doctor_Type}</p>
                               <p className="text-sm">
                                 {new Date(appointment.date).toLocaleDateString("en-US", {
                                   weekday: "long",

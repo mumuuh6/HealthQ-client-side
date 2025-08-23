@@ -17,7 +17,7 @@ const UseAxiosNormal=()=>{
             return response;
           },
           async (error) => {
-            console.log("Error from interceptor:", error.response);
+            //console.log("Error from interceptor:", error.response);
     
             // Handle 401 or 403 errors
             if (error.response?.status === 401 || error.response?.status === 403) {

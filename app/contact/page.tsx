@@ -34,7 +34,7 @@ export default function ContactPage() {
 
     const onSubmit = (data: ContactFormValues) => {
         // In a real app, you would send this data to your backend
-        console.log("Contact form data:", data)
+        //console.log("Contact form data:", data)
 
         // Show success message
         Swal.fire({

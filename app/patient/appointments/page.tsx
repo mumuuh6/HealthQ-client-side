@@ -18,7 +18,7 @@ import { useSession } from "next-auth/react"
 type Appointment = {
   id: number
   doctor?: string | 'no name'
-  specialty?: string 
+  Doctor_Type?: string 
   date: string
   timeSlotId: number | string
   time: string
@@ -65,7 +65,7 @@ export default function PatientAppointmentsPage() {
     if (sortBy === "date-asc") return a.date.getTime() - b.date.getTime()
     if (sortBy === "date-desc") return b.date.getTime() - a.date.getTime()
     if (sortBy === "doctor") return a.doctor.localeCompare(b.doctor)
-    if (sortBy === "specialty") return a.specialty.localeCompare(b.specialty)
+    if (sortBy === "Doctor_Type") return a.Doctor_Type.localeCompare(b.Doctor_Type)
     return 0
   })
 
@@ -107,7 +107,7 @@ export default function PatientAppointmentsPage() {
                         <SelectItem value="date-desc">Newest First</SelectItem>
                         <SelectItem value="date-asc">Oldest First</SelectItem>
                         <SelectItem value="doctor">Doctor Name</SelectItem>
-                        <SelectItem value="specialty">Specialty</SelectItem>
+                        <SelectItem value="Doctor_Type">Doctor_Type</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -152,7 +152,7 @@ export default function PatientAppointmentsPage() {
                                       : "Cancelled"}
                                 </Badge>
                               </div>
-                              <p className="text-sm ">{appointment.specialty}</p>
+                              <p className="text-sm ">{appointment.Doctor_Type}</p>
                               <p className="text-sm">
                                 {format(appointment.date, "EEEE, MMMM d, yyyy")} at {appointment.timeSlotId}
                               </p>

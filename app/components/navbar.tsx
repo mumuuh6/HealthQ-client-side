@@ -25,7 +25,7 @@ export function Navbar() {
     const fetchUserRole = async () => {
       try {
         const response = await axiosinstance.get(`/signin/${session?.user?.email}`);
-        //console.log('user role', response.data?.userInfo?.userType);
+        ////console.log('user role', response.data?.userInfo?.userType);
         setrole(response.data?.userInfo?.userType);
       } catch (error) {
         console.error('Error fetching user role:', error);
@@ -57,7 +57,7 @@ export function Navbar() {
     }
     return pathname === path
   }
-console.log('role', status);
+//console.log('role', status);
   return (
     <header className="max-w-7xl mx-auto sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 md:px-6">
       <div className=" flex h-16 items-center justify-around">

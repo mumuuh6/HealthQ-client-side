@@ -26,7 +26,7 @@ type Report = {
 };
 
 type ConsultationSummary = {
-  reasonForVisit: string;
+  ReasonForVisit: string;
   doctorNotes: string;
   medications: Medication[];
   followUpInstructions: string;
@@ -37,12 +37,12 @@ export type Patient = {
   doctorId: string;
   date: string; // ISO date string
   timeSlotId: string;
-  reason: string;
+  Reason: string;
   notes: string;
   doctor: string;
   age: string;
   gender: string;
-  specialty: string;
+  Doctor_Type: string;
   status: string;
   email: string;
   consultationSummary: ConsultationSummary;
@@ -159,7 +159,7 @@ export default function DoctorPatientsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [activeTab, setActiveTab] = useState("all")
   const { doctorpatientinfo: patients } = useDoctors()
-  //console.log('doctorinfo',JSON.stringify(patients, null, 2))
+  ////console.log('doctorinfo',JSON.stringify(patients, null, 2))
   // Filter patients based on search query and active tab
   const filteredPatients = patients.filter((patient: Patient) => {
     const matchesSearch =

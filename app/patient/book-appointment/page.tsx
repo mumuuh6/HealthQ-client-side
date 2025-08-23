@@ -25,10 +25,10 @@ import usePatients from "@/app/hook/usePatient"
 
 
 // const doctors = [
-//   { id: 1, name: "Dr. Sarah Johnson", specialty: "Cardiologist", availableDays: [1, 3, 5] },
-//   { id: 2, name: "Dr. Michael Chen", specialty: "Dermatologist", availableDays: [2, 4] },
-//   { id: 3, name: "Dr. Emily Wilson", specialty: "General Practitioner", availableDays: [1, 2, 3, 4, 5] },
-//   { id: 4, name: "Dr. James Rodriguez", specialty: "Orthopedic Surgeon", availableDays: [1, 3, 5] },
+//   { id: 1, name: "Dr. Sarah Johnson", Doctor_Type: "Cardiologist", availableDays: [1, 3, 5] },
+//   { id: 2, name: "Dr. Michael Chen", Doctor_Type: "Dermatologist", availableDays: [2, 4] },
+//   { id: 3, name: "Dr. Emily Wilson", Doctor_Type: "General Practitioner", availableDays: [1, 2, 3, 4, 5] },
+//   { id: 4, name: "Dr. James Rodriguez", Doctor_Type: "Orthopedic Surgeon", availableDays: [1, 3, 5] },
 // ]
 
 
@@ -50,12 +50,12 @@ import usePatients from "@/app/hook/usePatient"
 type AppointmentFormValues = {
   doctorId: string
   doctor?: string
-  specialty?: string
+  Doctor_Type?: string
   location?: string
   status?: "upcoming" | "completed" | "cancelled"
   date: Date | undefined
   timeSlotId: string | number
-  reason: string
+  Reason: string
   notes: string
 
 }
@@ -70,7 +70,7 @@ interface Doctor {
   role: string;
   failedAttempts: number;
   block: boolean;
-  specialty: string;
+  Doctor_Type: string;
   timeSlotId: string;
   availableDays: number[]; // Assuming days are represented as integers (e.g., 1 = Monday)
 }
@@ -85,9 +85,9 @@ export default function BookAppointmentPage() {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<number | string | null>(null)
   const axiossecure = UseAxiosNormal();
   const { roleinfo: doctors } = useDoctors();
-  //console.log('doctors', doctors)
+  ////console.log('doctors', doctors)
   const { patientinfo } = usePatients();
-  //console.log("Patient Info:", patientinfo, "Doctors Data:", doctors);
+  ////console.log("Patient Info:", patientinfo, "Doctors Data:", doctors);
   const selectedDoctorData = doctors.find((doctor: Doctor) => doctor._id === selectedDoctor) || null
   //const selectedTimeSlotData = timeSlots.find((slot) => slot.id === selectedTimeSlot)
   const rawSlots = selectedDoctorData?.timeSlotId?.split(',') || [];
@@ -103,11 +103,11 @@ export default function BookAppointmentPage() {
       doctorId: '',
       date: undefined,
       timeSlotId: 0,
-      reason: "",
+      Reason: "",
       notes: "",
     },
   })
-  //console.log("Doctors data:", JSON.stringify(doctors));
+  ////console.log("Doctors data:", JSON.stringify(doctors));
 
 
   const handleDoctorSelect = (doctorId: string) => {
@@ -139,26 +139,23 @@ export default function BookAppointmentPage() {
   const onSubmit = async (data: AppointmentFormValues) => {
     // In a real app, you would submit the appointment data to your backend here
     const selectedDoctorDataa = doctors.find((doctor: Doctor) => doctor._id === data.doctorId) || null
-    console.log("Form Data:", selectedDoctorDataa)
+    ////console.log("Form Data:", selectedDoctorDataa)
     setSelectedTimeSlot(data.timeSlotId)
     const payload = {
-      doctorId: selectedDoctorDataa.Doctor_ID,
-      date: data.date,
-      Doctor_Age:selectedDoctorDataa.age,
+      Doctor_ID: selectedDoctorDataa.Doctor_ID,
+      date: data.date ? new Date(data.date).toISOString().replace('Z', '+00:00') : "",
+      Doctor_Age:Number(selectedDoctorDataa.age),
       timeSlotId: data.timeSlotId,
-      reason: data.reason,
+      Reason: data.Reason,
       notes: data.notes,
       doctor: selectedDoctorDataa.name,
-      Doctor_Type: selectedDoctorDataa.specialty,
+      Doctor_Type: selectedDoctorDataa.Doctor_Type,
       status: "upcoming",
       email: session?.user?.email,
       docotorEmail: selectedDoctorDataa.email,
       patientName: patientinfo.name,
       age: patientinfo.age,
       gender: patientinfo.gender,
-      
-      
-
     }
     const formattedDate = payload?.date
       ? (d => `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`)(new Date(payload.date))
@@ -195,58 +192,58 @@ export default function BookAppointmentPage() {
       date: formattedDate,
       startTime: startTime,   // start time in HH:mm
       endTime: endTime,  // optional: send end time for flexibility
-      summary: payload.reason,
+      summary: payload.Reason,
     };
-   // console.log('MeetPayload', MeetPayload, payload);
+   ////console.log('MeetPayload', JSON.stringify(payload));
 
-    try {
-      const res = await axiossecure.post('/api/google/create-event', MeetPayload);
-      if (res?.data?.status) {
-        const newPayload = {
-          ...payload,
-          meetlink: res.data.meetLink
-        }
-        //console.log('newPayload', newPayload)
-        try {
-          const res2 = await axiossecure.post('/book-appointment', newPayload);
-          if (res2?.data?.data?.insertedId) {
-            // Show success message
-            Swal.fire({
-              title: "Appointment Booked!",
-              text: "Your appointment has been scheduled successfully.",
-              icon: "success",
-              confirmButtonColor: "var(--primary)",
-            }).then(() => {
-              router.push("/patient/dashboard")
-            })
-          }
-        }
-        catch (error) {
-          console.error("Error creating appointment:", error);
-          Swal.fire({
-            title: "Error",
-            text: "Failed to create appointment. Please try again later.",
-            icon: "error",
-            confirmButtonColor: "var(--primary)",
-          })
-          return;
-        }
-      }
-    }
-    catch (error) {
-      console.error("Error booking appointment:", error);
-      Swal.fire({
-        title: "Error",
-        text: "Failed to book appointment. Please try again later.",
-        icon: "error",
-        confirmButtonColor: "var(--primary)",
-      })
-      return;
-    }
+    // try {
+    //   const res = await axiossecure.post('/api/google/create-event', MeetPayload);
+    //   if (res?.data?.status) {
+    //     const newPayload = {
+    //       ...payload,
+    //       meetlink: res.data.meetLink
+    //     }
+    //     ////console.log('newPayload', newPayload)
+    //     try {
+    //       const res2 = await axiossecure.post('/book-appointment', newPayload);
+    //       if (res2?.data?.data?.insertedId) {
+    //         // Show success message
+    //         Swal.fire({
+    //           title: "Appointment Booked!",
+    //           text: "Your appointment has been scheduled successfully.",
+    //           icon: "success",
+    //           confirmButtonColor: "var(--primary)",
+    //         }).then(() => {
+    //           router.push("/patient/dashboard")
+    //         })
+    //       }
+    //     }
+    //     catch (error) {
+    //       console.error("Error creating appointment:", error);
+    //       Swal.fire({
+    //         title: "Error",
+    //         text: "Failed to create appointment. Please try again later.",
+    //         icon: "error",
+    //         confirmButtonColor: "var(--primary)",
+    //       })
+    //       return;
+    //     }
+    //   }
+    // }
+    // catch (error) {
+    //   console.error("Error booking appointment:", error);
+    //   Swal.fire({
+    //     title: "Error",
+    //     text: "Failed to book appointment. Please try again later.",
+    //     icon: "error",
+    //     confirmButtonColor: "var(--primary)",
+    //   })
+    //   return;
+    // }
 
 
   }
-//console.log("Selected Doctor Data:", timeSlots);
+////console.log("Selected Doctor Data:", timeSlots);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -359,7 +356,7 @@ export default function BookAppointmentPage() {
                           </div>
                           <div>
                             <p className="font-medium">{doctor.name}</p>
-                            <p className="text-sm ">{doctor.specialty}</p>
+                            <p className="text-sm ">{doctor.Doctor_Type}</p>
                           </div>
                         </div>
                         <ChevronRight className="h-5 w-5 " />
@@ -478,21 +475,21 @@ export default function BookAppointmentPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="reason">Reason for Visit</Label>
+                      <Label htmlFor="Reason">Reason for Visit</Label>
                       <select
-                        id="reason"
+                        id="Reason"
                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder: focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        {...form.register("reason", { required: true })}
+                        {...form.register("Reason", { required: true })}
                       >
-                        <option value="">Select a reason</option>
+                        <option value="">Select a Reason</option>
                         <option value="Regular Check-up">Regular Check-up</option>
                         <option value="Follow-up Appointment">Follow-up Appointment</option>
                         <option value="Consultation">Consultation</option>
                         <option value="Illness or Injury">Illness or Injury</option>
                         <option value="Other">Other</option>
                       </select>
-                      {form.formState.errors.reason && (
-                        <p className="text-sm text-red-500">Please select a reason for your visit</p>
+                      {form.formState.errors.Reason && (
+                        <p className="text-sm text-red-500">Please select a Reason for your visit</p>
                       )}
                     </div>
 

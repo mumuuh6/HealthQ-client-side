@@ -54,7 +54,7 @@ function getDayNamesFromNumbers(days: number[]) {
 // Mock doctor profile data
 const doctorProfile = {
   name: "",
-  specialty: "",
+  Doctor_Type: "",
   email: "",
   phone: "",
   address: "",
@@ -96,14 +96,14 @@ const doctorProfile = {
 export default function DoctorProfilePage() {
   const axiossecure = UseAxiosNormal()
   const { doctorinfo:doctor, refetch } = useDoctors()
-  //console.log("Doctor info:", doctor)
+  ////console.log("Doctor info:", doctor)
   const { data: session, update } = useSession()
   const [activeTab, setActiveTab] = useState("personal")
   const [isEditing, setIsEditing] = useState(false)
   const [profile, setProfile] = useState(doctorProfile)
 
   const handleSaveProfile = async () => {
-   console.log("Profile to be saved:", profile)
+   //console.log("Profile to be saved:", profile)
     const daysArray = String(profile.availableDays || "")
       .split(",")
       .map(day => day.trim().toLowerCase())
@@ -113,7 +113,7 @@ export default function DoctorProfilePage() {
       ...profile,
       availableDays: daysArray.length > 0 ? daysArray : [],
     }
-   console.log("Updated Profile:", updatedProfile)
+   //console.log("Updated Profile:", updatedProfile)
     // In a real app, you would save the profile data to your backend here
     try {
       const res = await axiossecure.patch(`/profile/${session?.user?.email}`, updatedProfile);
@@ -134,7 +134,7 @@ export default function DoctorProfilePage() {
     setIsEditing(false)
     // Show success message
   }
-  //console.log("Profile data:", JSON.stringify(profile, null, 2))
+  ////console.log("Profile data:", JSON.stringify(profile, null, 2))
   return (
     <div className="flex min-h-screen flex-col">
       <main className="flex-1 p-4 md:p-6 bg-muted/40">
@@ -186,7 +186,7 @@ export default function DoctorProfilePage() {
                   </div>
                   <div>
                     <CardTitle className="text-2xl">{doctor?.name}</CardTitle>
-                    <CardDescription className="text-lg">{doctor?.specialty}</CardDescription>
+                    <CardDescription className="text-lg">{doctor?.Doctor_Type}</CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -211,12 +211,12 @@ export default function DoctorProfilePage() {
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="specialty">Specialty</Label>
+                            <Label htmlFor="Doctor_Type">Doctor_Type</Label>
                             <Input
-                              id="specialty"
-                              value={profile?.specialty}
-                              placeholder={doctor.specialty}
-                              onChange={(e) => setProfile({ ...profile, specialty: e.target.value })}
+                              id="Doctor_Type"
+                              value={profile?.Doctor_Type}
+                              placeholder={doctor.Doctor_Type}
+                              onChange={(e) => setProfile({ ...profile, Doctor_Type: e.target.value })}
                             />
                           </div>
                           <div className="space-y-2">

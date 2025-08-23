@@ -54,7 +54,7 @@ export default function LoginPage() {
       }
       try {
         const res = await axiosInstanceNormal.get(`/signin/${data.email}`);
-        console.log("Response from login:", res.data);
+        ////console.log("Response from login:", res.data);
         if (res?.data?.status) {
           const userInfo = res?.data?.userInfo;
           

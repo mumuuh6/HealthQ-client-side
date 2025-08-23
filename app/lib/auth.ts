@@ -51,7 +51,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         `https://health-q-server.vercel.app/signin/${session?.user?.email}`
       );
       const user = res.data?.userInfo;
-      console.log(user,'k')
+      //console.log(user,'k')
       if (user) {
         session.user.name = user.name;
         

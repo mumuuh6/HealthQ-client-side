@@ -28,14 +28,14 @@ import useMedicines from "@/app/hook/useMedicine"
 
 export default function MedicineDetailPage() {
   const params = useParams()
-  //console.log("params", params.slug)
+  ////console.log("params", params.slug)
   const router = useRouter()
 //   const [medicine, setMedicine] = useState<any>(null)
   const [selectedUnit, setSelectedUnit] = useState(0)
   const [quantity, setQuantity] = useState(1)
     const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug
     const { PerMedicineInfo: medicine,isPerMedicineLoading } = useMedicines(slug)
-    //console.log("Medicines", Medicines)
+    ////console.log("Medicines", Medicines)
 //   useEffect(() => {
 //     const foundMedicine = Medicines.find((m) => m.slug === params.slug)
 //     if (foundMedicine) {

@@ -78,7 +78,7 @@ const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
       pdf.setFont("helvetica", "normal")
       pdf.text(`Doctor: ${appointment.doctor}`, margin, yPosition)
       yPosition += 8
-      pdf.text(`Specialty: ${appointment.specialty}`, margin, yPosition)
+      pdf.text(`Doctor_Type: ${appointment.Doctor_Type}`, margin, yPosition)
       yPosition += 8
       
       pdf.text(`Date: ${new Date(appointment.date).toLocaleDateString()}`, margin, yPosition)
@@ -98,7 +98,7 @@ const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
 
         pdf.setFontSize(12)
         pdf.setFont("helvetica", "normal")
-        yPosition = addText(appointment.consultationSummary.reasonForVisit, margin, yPosition, pageWidth - 2 * margin)
+        yPosition = addText(appointment.consultationSummary.ReasonForVisit, margin, yPosition, pageWidth - 2 * margin)
         yPosition += 10
 
         // Doctor's Notes
@@ -224,7 +224,7 @@ const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
                 <User className="h-5 w-5 text-primary mt-0.5" />
                 <div>
                   <h3 className="font-medium">{appointment.doctor}</h3>
-                  {/* <p className="text-sm text-muted-foreground">{appointment.specialty}</p> */}
+                  {/* <p className="text-sm text-muted-foreground">{appointment.Doctor_Type}</p> */}
                   {/* {appointment.doctorProfile && (
                     <Link href={appointment.doctorProfile} className="text-sm text-primary hover:underline">
                       View Doctor Profile
@@ -237,7 +237,7 @@ const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
                 <Building className="h-5 w-5 text-primary mt-0.5" />
                 <div>
                   <h3 className="font-medium">Department</h3>
-                  <p className="text-sm">{appointment.specialty}</p>
+                  <p className="text-sm">{appointment.Doctor_Type}</p>
                 </div>
               </div>
 
@@ -267,7 +267,7 @@ const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
                     <CardTitle className="text-base">Reason for Visit</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm">{appointment.consultationSummary.reasonForVisit}</p>
+                    <p className="text-sm">{appointment.consultationSummary.ReasonForVisit}</p>
                   </CardContent>
                 </Card>
 
