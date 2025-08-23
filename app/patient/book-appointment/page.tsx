@@ -149,7 +149,7 @@ export default function BookAppointmentPage() {
       reason: data.reason,
       notes: data.notes,
       doctor: selectedDoctorDataa.name,
-      specialty: selectedDoctorDataa.specialty,
+      Doctor_Type: selectedDoctorDataa.specialty,
       status: "upcoming",
       email: session?.user?.email,
       docotorEmail: selectedDoctorDataa.email,
@@ -485,11 +485,11 @@ export default function BookAppointmentPage() {
                         {...form.register("reason", { required: true })}
                       >
                         <option value="">Select a reason</option>
-                        <option value="check-up">Regular Check-up</option>
-                        <option value="follow-up">Follow-up Appointment</option>
-                        <option value="consultation">Consultation</option>
-                        <option value="illness">Illness or Injury</option>
-                        <option value="other">Other</option>
+                        <option value="Regular Check-up">Regular Check-up</option>
+                        <option value="Follow-up Appointment">Follow-up Appointment</option>
+                        <option value="Consultation">Consultation</option>
+                        <option value="Illness or Injury">Illness or Injury</option>
+                        <option value="Other">Other</option>
                       </select>
                       {form.formState.errors.reason && (
                         <p className="text-sm text-red-500">Please select a reason for your visit</p>
