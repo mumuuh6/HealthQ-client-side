@@ -84,7 +84,7 @@ const userData={
 
     try{
       const response =await axiosInstanceNormal.post("signup",userData);
-      
+      console.log("Response from Sign Uppepepe:", response.data);
       if(response?.data?.status){
         Swal.fire({
           title: "Success!",

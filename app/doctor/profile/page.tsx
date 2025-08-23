@@ -60,6 +60,8 @@ const doctorProfile = {
   address: "",
   availableDays: "",
   bio: "",
+  timeSlotId: "",
+  age:'',
   // education: [
   //   {
   //     degree: "",
@@ -101,6 +103,7 @@ export default function DoctorProfilePage() {
   const [profile, setProfile] = useState(doctorProfile)
 
   const handleSaveProfile = async () => {
+   console.log("Profile to be saved:", profile)
     const daysArray = String(profile.availableDays || "")
       .split(",")
       .map(day => day.trim().toLowerCase())
@@ -110,7 +113,7 @@ export default function DoctorProfilePage() {
       ...profile,
       availableDays: daysArray.length > 0 ? daysArray : [],
     }
-    
+   console.log("Updated Profile:", updatedProfile)
     // In a real app, you would save the profile data to your backend here
     try {
       const res = await axiossecure.patch(`/profile/${session?.user?.email}`, updatedProfile);
@@ -255,6 +258,26 @@ export default function DoctorProfilePage() {
 
                             />
                           </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="timeSlotId">Available Slots</Label>
+                            <Input
+                              id="timeSlotId"
+                              placeholder="e.g. 9.00 AM - 10.00 AM"
+                              value={profile?.timeSlotId || ""}
+                              onChange={(e) => setProfile({ ...profile, timeSlotId: e.target.value })}
+
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="age">Age</Label>
+                            <Input
+                              id="timeSlotId"
+                              placeholder="e.g. 22"
+                              value={profile?.age || ''}
+                              onChange={(e) => setProfile({ ...profile, age: e.target.value })}
+
+                            />
+                          </div>
 
                         </div>
 
@@ -275,17 +298,17 @@ export default function DoctorProfilePage() {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                               <p className="text-sm ">Email</p>
-                              <p>{doctor.email}</p>
+                              <p>{doctor.email||'Please Provide Your Information'}</p>
                             </div>
                             <div>
                               <p className="text-sm ">Phone</p>
-                              <p>{doctor.phone}</p>
+                              <p>{doctor.phone||'Please Provide Your Information'}</p>
                             </div>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                               <p className="text-sm ">Address</p>
-                              <p>{doctor.address}</p>
+                              <p>{doctor.address ||'Please Provide Your Information'}</p>
                             </div>
                             <div>
                               <p className="text-sm ">Available Days</p>
@@ -297,11 +320,25 @@ export default function DoctorProfilePage() {
                               </p>
                             </div>
                           </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <p className="text-sm ">Available Slots</p>
+                              <p>{doctor.timeSlotId ||'Please Provide Your Information'}</p>
+                            </div>
+                            
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <p className="text-sm ">Age</p>
+                              <p>{doctor.age ||'Please Provide Your Information'}</p>
+                            </div>
+                            
+                          </div>
                         </div>
                         <Separator />
                         <div className="space-y-3">
                           <h3 className="text-lg font-medium">Professional Bio</h3>
-                          <p>{doctor.bio}</p>
+                          <p>{doctor.bio ||'Please Provide Your Information'}</p>
                         </div>
                       </div>
                     )}

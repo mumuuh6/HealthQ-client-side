@@ -32,20 +32,20 @@ import usePatients from "@/app/hook/usePatient"
 // ]
 
 
-const timeSlots = [
-  { id: 1, time: "9:00 AM" },
-  { id: 2, time: "9:30 AM" },
-  { id: 3, time: "10:00 AM" },
-  { id: 4, time: "10:30 AM" },
-  { id: 5, time: "11:00 AM" },
-  { id: 6, time: "11:30 AM" },
-  { id: 7, time: "1:00 PM" },
-  { id: 8, time: "1:30 PM" },
-  { id: 9, time: "2:00 PM" },
-  { id: 10, time: "2:30 PM" },
-  { id: 11, time: "3:00 PM" },
-  { id: 12, time: "3:30 PM" },
-]
+// const timeSlots = [
+//   { id: 1, time: "9:00 AM" },
+//   { id: 2, time: "9:30 AM" },
+//   { id: 3, time: "10:00 AM" },
+//   { id: 4, time: "10:30 AM" },
+//   { id: 5, time: "11:00 AM" },
+//   { id: 6, time: "11:30 AM" },
+//   { id: 7, time: "1:00 PM" },
+//   { id: 8, time: "1:30 PM" },
+//   { id: 9, time: "2:00 PM" },
+//   { id: 10, time: "2:30 PM" },
+//   { id: 11, time: "3:00 PM" },
+//   { id: 12, time: "3:30 PM" },
+// ]
 
 type AppointmentFormValues = {
   doctorId: string
@@ -57,6 +57,7 @@ type AppointmentFormValues = {
   timeSlotId: string | number
   reason: string
   notes: string
+
 }
 interface Doctor {
   _id: string;
@@ -70,6 +71,7 @@ interface Doctor {
   failedAttempts: number;
   block: boolean;
   specialty: string;
+  timeSlotId: string;
   availableDays: number[]; // Assuming days are represented as integers (e.g., 1 = Monday)
 }
 
@@ -83,8 +85,18 @@ export default function BookAppointmentPage() {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<number | string | null>(null)
   const axiossecure = UseAxiosNormal();
   const { roleinfo: doctors } = useDoctors();
+  //console.log('doctors', doctors)
   const { patientinfo } = usePatients();
   //console.log("Patient Info:", patientinfo, "Doctors Data:", doctors);
+  const selectedDoctorData = doctors.find((doctor: Doctor) => doctor._id === selectedDoctor) || null
+  //const selectedTimeSlotData = timeSlots.find((slot) => slot.id === selectedTimeSlot)
+  const rawSlots = selectedDoctorData?.timeSlotId?.split(',') || [];
+
+  const timeSlots = rawSlots.map((time: string, index: number) => ({
+    id: index,   // unique id
+    time: time.trim()
+  }));
+
 
   const form = useForm<AppointmentFormValues>({
     defaultValues: {
@@ -127,11 +139,12 @@ export default function BookAppointmentPage() {
   const onSubmit = async (data: AppointmentFormValues) => {
     // In a real app, you would submit the appointment data to your backend here
     const selectedDoctorDataa = doctors.find((doctor: Doctor) => doctor._id === data.doctorId) || null
-    //console.log("Selected Doctor Data:", selectedDoctorDataa);
+    console.log("Form Data:", selectedDoctorDataa)
     setSelectedTimeSlot(data.timeSlotId)
     const payload = {
-      doctorId: selectedDoctorDataa._id,
+      doctorId: selectedDoctorDataa.Doctor_ID,
       date: data.date,
+      Doctor_Age:selectedDoctorDataa.age,
       timeSlotId: data.timeSlotId,
       reason: data.reason,
       notes: data.notes,
@@ -142,23 +155,50 @@ export default function BookAppointmentPage() {
       docotorEmail: selectedDoctorDataa.email,
       patientName: patientinfo.name,
       age: patientinfo.age,
-      gender: patientinfo.gender
+      gender: patientinfo.gender,
+      
+      
 
     }
     const formattedDate = payload?.date
       ? (d => `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`)(new Date(payload.date))
       : "";
-    const formattedTime = (t: string): string => `${String((h => h % 12 + (/PM/i.test(t) ? 12 : 0))(Number(t.split(':')[0]))).padStart(2, '0')}:${t.split(':')[1].split(' ')[0]}`;
-    console.log(payload.timeSlotId)
+    const parseTime = (t: string) => {
+      // Normalize string
+      t = t.replace('.', ':').toUpperCase().trim(); // "5pm" → "5:00 PM" is optional, we just parse
+
+      // Match hours, optional minutes, and AM/PM
+      const match = t.match(/^(\d{1,2}):?(\d{0,2})\s*(AM|PM)$/);
+      if (!match) return { hours: NaN, minutes: NaN };
+
+      let hours = parseInt(match[1]);
+      const minutes = match[2] ? parseInt(match[2]) : 0;
+      const period = match[3];
+
+      if (period === 'PM' && hours !== 12) hours += 12;
+      if (period === 'AM' && hours === 12) hours = 0;
+
+      return { hours, minutes };
+    };
+    const slot = payload.timeSlotId;
+    const [startStr, endStr] = typeof slot === "string"
+      ? slot.split('-').map(s => s.trim())
+      : ["", ""];
+
+    const start = parseTime(startStr);
+    const end = parseTime(endStr);
+    const startTime = `${String(start.hours).padStart(2, '0')}:${String(start.minutes).padStart(2, '0')}`;
+    const endTime = `${String(end.hours).padStart(2, '0')}:${String(end.minutes).padStart(2, '0')}`;
     const MeetPayload = {
       doctorEmail: payload.docotorEmail,
       patientEmail: payload.email,
       date: formattedDate,
-      time: formattedTime(String(payload.timeSlotId)),
+      startTime: startTime,   // start time in HH:mm
+      endTime: endTime,  // optional: send end time for flexibility
       summary: payload.reason,
-    }
+    };
+   // console.log('MeetPayload', MeetPayload, payload);
 
-    
     try {
       const res = await axiossecure.post('/api/google/create-event', MeetPayload);
       if (res?.data?.status) {
@@ -203,12 +243,10 @@ export default function BookAppointmentPage() {
       })
       return;
     }
-    
+
 
   }
-
-  const selectedDoctorData = doctors.find((doctor: Doctor) => doctor._id === selectedDoctor) || null
-  //const selectedTimeSlotData = timeSlots.find((slot) => slot.id === selectedTimeSlot)
+//console.log("Selected Doctor Data:", timeSlots);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -389,9 +427,9 @@ export default function BookAppointmentPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {timeSlots.map((slot) => (
+                    {timeSlots.map((slot:{ id: number; time: string }, index:number) => (
                       <div
-                        key={slot.id}
+                        key={index}
                         className={cn(
                           "flex items-center justify-center p-3 rounded-lg border cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors",
                           selectedTimeSlot === slot.id && "border-primary bg-primary/5",

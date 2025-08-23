@@ -57,6 +57,7 @@ export default function LoginPage() {
         console.log("Response from login:", res.data);
         if (res?.data?.status) {
           const userInfo = res?.data?.userInfo;
+          
           await signIn('credentials', {
             email: userInformation?.email,
             password: userInformation?.password,
