@@ -33,7 +33,7 @@ type Appointment = {
   time: string
   type: string
   duration: string
-  status: "confirmed" | "pending" | "canceled"
+  status: "confirmed"  | "upcoming"
 }
 
 export default function DoctorSchedulePage() {
@@ -49,7 +49,7 @@ export default function DoctorSchedulePage() {
     queryFn: async () => {
       if (!session?.user?.email) return []
       const res = await axiossecure.get(`/schedule/${session.user.email}`)
-      return res.data.data.map((appt: any) => ({
+      return res.data.data.map((appt: Appointment) => ({
         id: appt.id,
         patient: appt.patient,
         date: new Date(appt.date),
@@ -148,7 +148,7 @@ if (isLoading) return <div>Loading...</div>;
                                 className="flex items-center justify-between p-4 rounded-lg border hover:border-primary/50 hover:bg-muted/50 transition-colors"
                               >
                                 <div className="flex items-center gap-4">
-                                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-sm text-center font-medium">
+                                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted text-sm text-center font-medium">
                                     {appt.time}
                                   </div>
                                   <div>

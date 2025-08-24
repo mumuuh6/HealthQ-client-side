@@ -201,8 +201,8 @@ const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid grid-cols-3 mb-4">
             <TabsTrigger value="info">Information</TabsTrigger>
-            <TabsTrigger value="summary">Consultation</TabsTrigger>
-            <TabsTrigger value="reports">Reports</TabsTrigger>
+            {appointment.status === "completed" && <><TabsTrigger value="summary">Consultation</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger></>}
           </TabsList>
 
           <TabsContent value="info" className="space-y-4">
@@ -249,9 +249,9 @@ const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
                   {appointment.queuePosition && <p className="text-sm">Queue Number: {appointment.queuePosition}</p>}
                   {appointment && (
                     <div className="text-sm">
-                      <span>Predicted Wait: {appointment.estimatedWaitTime ||'null'}</span>
+                      <span>Predicted Wait: {appointment.estimatedWaitTime ||'UnAvailable'}</span>
                       <span className="mx-2">•</span>
-                      <span>Actual Wait: {appointment.ActualWaitTime ||'null'}</span>
+                      <span>Actual Wait: {appointment.ActualWaitTime ||'Not yet completed'}</span>
                     </div>
                   )}
                 </div>
@@ -363,7 +363,7 @@ const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
         <div className="flex flex-col sm:flex-row gap-3 mt-6">
           <Button className="flex-1" onClick={handleDownloadSummary} disabled={isGeneratingPDF}>
             <Download className="h-4 w-4 mr-2" />
-            {isGeneratingPDF ? "Generating PDF..." : "Download Summary"}
+            {isGeneratingPDF ? "Generating PDF..." : "Check Summary"}
           </Button>
           {/* <Button className="flex-1 bg-transparent" variant="outline" asChild>
             <Link href={`/patient/book-appointment?followUp=true&doctorId=${appointment.doctorId}`}>

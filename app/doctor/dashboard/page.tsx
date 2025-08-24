@@ -11,6 +11,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, Clock, UserCheck, UserX, ChevronRight, Users } from "lucide-react"
 import { useSession } from "next-auth/react"
+import UseAxiosNormal from "@/app/hook/UseAxiosNormal"
+import { useQuery } from "@tanstack/react-query"
+import { useRouter } from "next/navigation"
+import { ConsultationModal } from "@/app/consultation-modal"
 
 
 // Mock data for queue and appointments
@@ -110,34 +114,124 @@ const upcomingAppointments = [
     type: "Consultation",
   },
 ]
-
+type Appointment = {
+  id: string;
+  patient: string;
+  time: string;
+  type: string;
+  status: "checked_in" | "waiting" | "scheduled" | "confirmed";
+  date: Date; // Important: backend should send date as Date
+  duration?: string;
+};
 export default function DoctorDashboard() {
   const [activeTab, setActiveTab] = useState("today")
-  const [currentPatient, setCurrentPatient] = useState(queuePatients[0])
+const [currentPatients, setCurrentPatient] = useState<typeof queuePatients[0] | null>(queuePatients[0])
+const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false)
+  //const [currentPatient, setCurrentPatient] = useState(queuePatients[0])
+  
   const {data: session} = useSession();
+  const axiossecure = UseAxiosNormal();
+  const { data: appointments = [], isLoading } = useQuery({
+  queryKey: ["doctorAppointments", session?.user?.email],
+  queryFn: async () => {
+    if (!session?.user?.email) return [];
+    const res = await axiossecure.get(`/schedule/${session.user.email}`);
+    // Convert date strings to Date objects
+    return res.data.data.map((appt: Appointment) => ({
+      ...appt,
+      date: new Date(appt.date),
+    }));
+  },
+  enabled: !!session?.user?.email,
+});
+  const { data: currentPatient = [],isLoading:currentLoading } = useQuery({
+  queryKey: ["currentAppointments", session?.user?.email],
+  queryFn: async () => {
+    if (!session?.user?.email) return [];
+    const res = await axiossecure.get(`/current-patient/${session.user.email}`);
+    //console.log('currentPatientData',res.data)
+    return res?.data?.data || null;
+  },
+  enabled: !!session?.user?.email,
+});
+  const { data: normalPatient = [],isLoading:normalLoading } = useQuery({
+  queryKey: ["normalAppointments"],
+  queryFn: async () => {
+    
+    const res = await axiossecure.get(`/findpatient/${currentPatient.id}`);
+    console.log('currentPatientData',res.data)
+    return res?.data || null;
+  },
+  enabled: !!currentPatient?.id,
+});
+//console.log('currentPatient',currentPatient)
+//  const handleNextPatient = () => {
+//     Swal.fire({
+//       title: "Complete current appointment?",
+//       text: "This will take you to the consultation page to document the visit",
+//       icon: "question",
+//       showCancelButton: true,
+//       confirmButtonColor: "hsl(var(--primary))",
+//       cancelButtonColor: "hsl(var(--muted))",
+//       confirmButtonText: "Yes, complete consultation",
+//     }).then((result) => {
+//       if (result.isConfirmed) {
+//         // Navigate to consultation page
+//         router.push(`/doctor/consultation/${currentPatient.id}`)
+//       }
+//     })
+//   }
+
   const handleNextPatient = () => {
     Swal.fire({
       title: "Complete current appointment?",
-      text: "This will move to the next patient in the queue",
+      text: "This will open the consultation form to document the visit",
       icon: "question",
       showCancelButton: true,
       confirmButtonColor: "var(--primary)",
       cancelButtonColor: "var(--muted)",
-      confirmButtonText: "Yes, complete",
+      confirmButtonText: "Yes, complete consultation",
     }).then((result) => {
       if (result.isConfirmed) {
-        // In a real app, you would update the queue in your backend
-        setCurrentPatient(queuePatients[1])
-        Swal.fire({
-          title: "Next patient called",
-          text: "Emily Johnson is now being called",
-          icon: "success",
-          confirmButtonColor: "var(--primary)",
-        })
+        setIsConsultationModalOpen(true)
       }
     })
   }
 
+  const handleConsultationComplete = (data: any) => {
+    console.log("Consultation completed:", data)
+
+    // Move to next patient
+    const nextPatientIndex = queuePatients.findIndex((p) => p.id === currentPatients?.id) + 1
+    if (nextPatientIndex < queuePatients.length) {
+      setCurrentPatient(queuePatients[nextPatientIndex])
+    } else {
+      setCurrentPatient(null)
+    }
+
+    Swal.fire({
+      title: "Consultation Completed!",
+      text: "Patient consultation has been documented successfully",
+      icon: "success",
+      confirmButtonColor: "var(--primary)",
+    })
+  }
+const today = new Date();
+const todayAppointments = appointments.filter((appt:Appointment) => {
+  return (
+    appt.date.getDate() === today.getDate() &&
+    appt.date.getMonth() === today.getMonth() &&
+    appt.date.getFullYear() === today.getFullYear()
+  );
+});
+
+const upcomingAppointments = appointments.filter((appt:Appointment) => {
+  const apptDate = appt.date;
+  return apptDate > today;
+});
+if(currentLoading || isLoading){
+  return <div>Loading...</div>
+}
   return (
     <div className="flex min-h-screen flex-col">
       
@@ -170,9 +264,9 @@ export default function DoctorDashboard() {
                         <Avatar className="h-16 w-16">
                           <AvatarImage src="https://images.app.goo.gl/3wWrAmJDAEVYkPZy9" alt={currentPatient.name} />
                           <AvatarFallback>
-                            {currentPatient.name
+                            {(currentPatient?.name ?? '')
                               .split(" ")
-                              .map((n) => n[0])
+                              .map((n:string) => n[0])
                               .join("")}
                           </AvatarFallback>
                         </Avatar>
@@ -185,11 +279,11 @@ export default function DoctorDashboard() {
                       <div className="space-y-4">
                         <div className="flex justify-between text-sm">
                           <span>Appointment Type:</span>
-                          <span className="font-medium">Follow-up</span>
+                          <span className="font-medium">{currentPatient.appointmentType}</span>
                         </div>
                         <div className="flex justify-between text-sm">
                           <span>Patient ID:</span>
-                          <span className="font-medium">P-{currentPatient.id.toString().padStart(6, "0")}</span>
+                          <span className="font-medium">P-{currentPatient.id}</span>
                         </div>
                         <div className="flex justify-between text-sm">
                           <span>Time in consultation:</span>
@@ -323,10 +417,10 @@ export default function DoctorDashboard() {
                     </div>
 
                     <div className="space-y-2">
-                      {todayAppointments.map((appointment) => (
+                      {todayAppointments.map((appointment:Appointment) => (
                         <div key={appointment.id} className="flex items-center justify-between p-3 rounded-lg border">
                           <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-sm font-medium">
+                            <div className="flex h-16 w-16 items-center justify-center text-center rounded-full bg-muted text-sm font-medium">
                               {appointment.time.replace(" AM", "").replace(" PM", "")}
                             </div>
                             <div>
@@ -361,16 +455,16 @@ export default function DoctorDashboard() {
                   </TabsContent>
                   <TabsContent value="upcoming" className="space-y-4">
                     <div className="space-y-2">
-                      {upcomingAppointments.map((appointment) => (
+                      {upcomingAppointments.map((appointment:Appointment) => (
                         <div key={appointment.id} className="flex items-center justify-between p-3 rounded-lg border">
                           <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-sm font-medium">
+                            <div className="flex h-16 w-16 text-center items-center justify-center rounded-full bg-muted text-sm font-medium">
                               {appointment.time.replace(" AM", "").replace(" PM", "")}
                             </div>
                             <div>
                               <p className="font-medium">{appointment.patient}</p>
                               <div className="flex items-center gap-1">
-                                <p className="text-xs ">{appointment.date}</p>
+                                <p className="text-xs ">{appointment.date.toLocaleDateString()}</p>
                                 <span className="text-xs ">•</span>
                                 <p className="text-xs ">{appointment.type}</p>
                               </div>
@@ -389,6 +483,12 @@ export default function DoctorDashboard() {
           </motion.div>
         </div>
       </main>
+      <ConsultationModal
+        isOpen={isConsultationModalOpen}
+        onClose={() => setIsConsultationModalOpen(false)}
+        patient={normalPatient}
+        onComplete={handleConsultationComplete}
+      />
     </div>
   )
 }

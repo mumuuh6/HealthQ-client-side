@@ -13,48 +13,15 @@ import UseAxiosNormal from "@/app/hook/UseAxiosNormal"
 import { useQuery } from "@tanstack/react-query"
 import { AppointmentDetailsModal } from "@/app/components/appointment-details-modal"
 
-// // Mock data for appointments
-// const upcomingAppointments = [
-//   {
-//     id: 1,
-//     doctor: "Dr. Sarah Johnson",
-//     Doctor_Type: "Cardiologist",
-//     date: "2025-04-20",
-//     time: "10:00 AM",
-//     status: "confirmed",
-//     queuePosition: 3,
-//     estimatedWaitTime: "15 minutes",
-//   },
-//   {
-//     id: 2,
-//     doctor: "Dr. Michael Chen",
-//     Doctor_Type: "Dermatologist",
-//     date: "2025-04-25",
-//     time: "2:30 PM",
-//     status: "confirmed",
-//     queuePosition: null,
-//     estimatedWaitTime: null,
-//   },
-// ]
-
-// const pastAppointments = [
-//   {
-//     id: 3,
-//     doctor: "Dr. Emily Wilson",
-//     Doctor_Type: "General Practitioner",
-//     date: "2025-04-01",
-//     time: "9:15 AM",
-//     status: "completed",
-//   },
-//   {
-//     id: 4,
-//     doctor: "Dr. James Rodriguez",
-//     Doctor_Type: "Orthopedic Surgeon",
-//     date: "2025-03-15",
-//     time: "11:30 AM",
-//     status: "completed",
-//   },
-// ]
+type ActiveQueue = {
+  _id: string
+  doctor: string
+  Doctor_Type: string
+  date: string
+  timeSlotId: string
+  queuePosition: number
+  estimatedWaitTime?: string
+}
 type Appointment = {
   _id: string
   doctor?: string | 'no name'
@@ -92,14 +59,22 @@ export default function PatientDashboard() {
     },
     enabled: !!session?.user?.email,
   });
+    const { data: activeQueue } = useQuery<ActiveQueue | null>({
+    queryKey: ['activeQueue', session?.user?.email],
+    queryFn: async () => {
+      if (!session?.user?.email) return null
+      const res = await axiossecure.get(`/patient/active-queue/${session.user.email}`)
+      return res.data.data || null
+    },
+    enabled: !!session?.user?.email
+  })
   const app = upcomingAppointments.find((app: Appointment) => app.queuePosition)
-  ////console.log('selectedAppointment', selectedAppointment)
-  ////console.log('upcomingAppointments', upcomingAppointments)
   const isToday = (appointmentDate: string | Date): boolean => {
   const today = new Date();
   const date = new Date(appointmentDate);
   return today.toDateString() === date.toDateString();
 };
+console.log(activeQueue)
   return (
     <div className="flex min-h-screen flex-col">
 
@@ -126,43 +101,43 @@ export default function PatientDashboard() {
               </CardHeader>
               <CardContent className="p-6">
                 {
-                  app ? (
+                  activeQueue ? (
                     <div className="flex flex-col md:flex-row md:items-center gap-6">
                       <div className="flex flex-col items-center justify-center p-6 bg-primary/5 rounded-lg">
-                        <span className="text-4xl font-bold text-primary">{app.queuePosition}</span>
+                        <span className="text-4xl font-bold text-primary">{activeQueue.queuePosition}</span>
                         <span className="text-sm ">Your Position</span>
                       </div>
                       <div className="space-y-4 flex-1">
                         <div>
-                          <h3 className="font-medium">{app.doctor} - {app.Doctor_Type}</h3>
+                          <h3 className="font-medium">{activeQueue.doctor} - {app.Doctor_Type}</h3>
                           <p className="text-sm">
                             {new Date(app.date).toDateString() === new Date().toDateString()
-                              ? `Today at ${app.timeSlotId}`
-                              : `${new Date(app.date).toLocaleDateString("en-US", {
+                              ? `Today at ${activeQueue.timeSlotId}`
+                              : `${new Date(activeQueue.date).toLocaleDateString("en-US", {
                                 weekday: "long",
                                 year: "numeric",
                                 month: "long",
                                 day: "numeric",
-                              })} at ${app.timeSlotId}`}
+                              })} at ${activeQueue.timeSlotId}`}
                           </p>
 
                         </div>
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
                             <span>Estimated wait time:</span>
-                            <span className="font-medium">{app.estimatedWaitTime}</span>
+                            <span className="font-medium">{activeQueue.estimatedWaitTime ||'UnAvailable'}</span>
                           </div>
                           <div className="flex justify-between text-sm">
-                            <span>People ahead of you:</span>
-                            <span className="font-medium">2</span>
+                            {/* <span>People ahead of you:</span>
+                            <span className="font-medium">2</span> */}
                           </div>
                         </div>
-                        <div className="flex gap-2">
+                        {/* <div className="flex gap-2">
                           <Button variant="outline" size="sm">
                             Leave Queue
                           </Button>
                           <Button size="sm">Check In</Button>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   ) : (
@@ -240,9 +215,9 @@ export default function PatientDashboard() {
                               )
 
                               }
-                              <Button size="sm" variant="outline">
-                                Reschedule
-                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => handleViewDetails(appointment)}>
+                              View Details
+                            </Button>
                             </div>
                           </div>
                         </div>
