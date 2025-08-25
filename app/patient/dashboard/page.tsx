@@ -55,11 +55,11 @@ export default function PatientDashboard() {
     queryFn: async () => {
       const res = await axiossecure.get(`/booked-appointments/${session?.user?.email}`);
 
-      return res?.data?.data ||[];
+      return res?.data?.data || [];
     },
     enabled: !!session?.user?.email,
   });
-    const { data: activeQueue,isLoading:activeLoading } = useQuery<ActiveQueue | null>({
+  const { data: activeQueue, isLoading: activeLoading } = useQuery<ActiveQueue | null>({
     queryKey: ['activeQueue', session?.user?.email],
     queryFn: async () => {
       if (!session?.user?.email) return null
@@ -71,14 +71,14 @@ export default function PatientDashboard() {
   })
   const app = upcomingAppointments.find((app: Appointment) => app.queuePosition)
   const isToday = (appointmentDate: string | Date): boolean => {
-  const today = new Date();
-  const date = new Date(appointmentDate);
-  return today.toDateString() === date.toDateString();
-};
-if(activeLoading){
-  return <div>loading...</div>
-}
-console.log(activeQueue)
+    const today = new Date();
+    const date = new Date(appointmentDate);
+    return today.toDateString() === date.toDateString();
+  };
+  if (activeLoading) {
+    return <div>loading...</div>
+  }
+  console.log(activeQueue)
   return (
     <div className="flex min-h-screen flex-col">
 
@@ -115,21 +115,22 @@ console.log(activeQueue)
                         <div>
                           <h3 className="font-medium">{activeQueue.doctor} - {activeQueue.Doctor_Type}</h3>
                           <p className="text-sm">
-                              {activeQueue && new Date(activeQueue.date).toDateString() === new Date().toDateString()
-    ? `Today at ${activeQueue.timeSlotId}`
-    : `${new Date(activeQueue.date).toLocaleDateString("en-US", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })} at ${activeQueue.timeSlotId}`}
+                            {activeQueue && new Date(activeQueue.date).toDateString() === new Date().toDateString()
+                              ? `Today at ${activeQueue.timeSlotId}`
+                              : `${new Date(activeQueue.date).toLocaleDateString("en-US", {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                                timeZone:'UTC'
+                              })} at ${activeQueue.timeSlotId}`}
                           </p>
 
                         </div>
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
                             <span>Estimated wait time:</span>
-                            <span className="font-medium">{activeQueue.estimatedWaitTime ||'UnAvailable'}</span>
+                            <span className="font-medium">{activeQueue.estimatedWaitTime || 'UnAvailable'}</span>
                           </div>
                           <div className="flex justify-between text-sm">
                             {/* <span>People ahead of you:</span>
@@ -220,8 +221,8 @@ console.log(activeQueue)
 
                               }
                               <Button size="sm" variant="outline" onClick={() => handleViewDetails(appointment)}>
-                              View Details
-                            </Button>
+                                View Details
+                              </Button>
                             </div>
                           </div>
                         </div>
