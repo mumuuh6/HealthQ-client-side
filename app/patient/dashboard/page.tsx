@@ -59,12 +59,13 @@ export default function PatientDashboard() {
     },
     enabled: !!session?.user?.email,
   });
-    const { data: activeQueue } = useQuery<ActiveQueue | null>({
+    const { data: activeQueue,isLoading:activeLoading } = useQuery<ActiveQueue | null>({
     queryKey: ['activeQueue', session?.user?.email],
     queryFn: async () => {
       if (!session?.user?.email) return null
       const res = await axiossecure.get(`/patient/active-queue/${session.user.email}`)
-      return res.data.data || null
+      console.log(res.data.data)
+      return res?.data?.data || null
     },
     enabled: !!session?.user?.email
   })
@@ -74,6 +75,9 @@ export default function PatientDashboard() {
   const date = new Date(appointmentDate);
   return today.toDateString() === date.toDateString();
 };
+if(activeLoading){
+  return <div>loading...</div>
+}
 console.log(activeQueue)
   return (
     <div className="flex min-h-screen flex-col">
@@ -109,7 +113,7 @@ console.log(activeQueue)
                       </div>
                       <div className="space-y-4 flex-1">
                         <div>
-                          <h3 className="font-medium">{activeQueue.doctor} - {app.Doctor_Type}</h3>
+                          <h3 className="font-medium">{activeQueue.doctor} - {activeQueue.Doctor_Type}</h3>
                           <p className="text-sm">
                             {new Date(app.date).toDateString() === new Date().toDateString()
                               ? `Today at ${activeQueue.timeSlotId}`

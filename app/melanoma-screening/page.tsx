@@ -72,7 +72,7 @@ export default function MelanomaScreeningPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            Melanoma Early Detection
+            Skin Cancer Detection
           </motion.h1>
           <motion.p
             className="max-w-[700px] text-muted-foreground md:text-xl"
