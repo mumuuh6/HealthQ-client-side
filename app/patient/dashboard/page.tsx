@@ -115,14 +115,14 @@ console.log(activeQueue)
                         <div>
                           <h3 className="font-medium">{activeQueue.doctor} - {activeQueue.Doctor_Type}</h3>
                           <p className="text-sm">
-                            {new Date(app.date).toDateString() === new Date().toDateString()
-                              ? `Today at ${activeQueue.timeSlotId}`
-                              : `${new Date(activeQueue.date).toLocaleDateString("en-US", {
-                                weekday: "long",
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                              })} at ${activeQueue.timeSlotId}`}
+                              {activeQueue && new Date(activeQueue.date).toDateString() === new Date().toDateString()
+    ? `Today at ${activeQueue.timeSlotId}`
+    : `${new Date(activeQueue.date).toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })} at ${activeQueue.timeSlotId}`}
                           </p>
 
                         </div>
