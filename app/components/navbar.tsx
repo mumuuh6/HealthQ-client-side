@@ -46,6 +46,7 @@ export function Navbar() {
     },
     { name: "Melanoma Screening", href: "/melanoma-screening" },
     { name: "Buy Medicine", href: "/medicines" },
+    { name: "Cart", href: "/cart" },
 
 
   ]

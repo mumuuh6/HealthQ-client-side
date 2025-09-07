@@ -12,6 +12,7 @@ const useMedicines = (slug?: string) => {
     queryKey: ['medicineinfo', session?.user?.email],
     queryFn: async () => {
       const res = await axiossecure.get(`medicines`);
+      console.log(res.data.data,'llll');
       return res.data?.user;
     },
     // enabled: !!session?.user?.email,

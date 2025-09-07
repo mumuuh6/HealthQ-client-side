@@ -26,7 +26,7 @@ interface ConsultationModalProps {
 export function ConsultationModal({ isOpen, onClose, patient, onComplete }: ConsultationModalProps) {
     const [activeTab, setActiveTab] = useState("consultation")
     const [isSubmitting, setIsSubmitting] = useState(false)
-    console.log('patient', patient)
+    //console.log('patient', patient)
     const axiossecure = UseAxiosNormal();
     // Form states
     const [consultationData, setConsultationData] = useState({

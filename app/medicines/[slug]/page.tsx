@@ -25,14 +25,15 @@ import {
   Thermometer,
 } from "lucide-react"
 import useMedicines from "@/app/hook/useMedicine"
+import { useCart } from "@/app/contexts/cart-context"
 
 export default function MedicineDetailPage() {
   const params = useParams()
-  ////console.log("params", params.slug)
   const router = useRouter()
-//   const [medicine, setMedicine] = useState<any>(null)
+  const {dispatch}=useCart();
   const [selectedUnit, setSelectedUnit] = useState(0)
   const [quantity, setQuantity] = useState(1)
+   const [isAddingToCart, setIsAddingToCart] = useState(false)
     const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug
     const { PerMedicineInfo: medicine,isPerMedicineLoading } = useMedicines(slug)
     ////console.log("Medicines", Medicines)
@@ -42,6 +43,36 @@ export default function MedicineDetailPage() {
 //       setMedicine(foundMedicine)
 //     }
 //   }, [params.slug])
+console.log("Medicine from slug", medicine)
+  const handleAddToCart = async () => {
+    if (!medicine) return
+
+    setIsAddingToCart(true)
+
+    const cartItem = {
+      id: medicine._id,
+      medicine_name: medicine.medicine_name,
+      generic_name: medicine.generic_name,
+      strength: medicine.strength,
+      manufacturer_name: medicine.manufacturer_name,
+      medicine_image: medicine.medicine_image,
+      selectedUnit: medicine.unit_prices[selectedUnit],
+      quantity: quantity,
+      rx_required: medicine.rx_required,
+      is_available: medicine.is_available,
+      slug: medicine.slug,
+    }
+
+    dispatch({ type: "ADD_TO_CART", payload: cartItem })
+
+    // Show success feedback
+    setTimeout(() => {
+      setIsAddingToCart(false)
+      // You could show a toast notification here
+      alert(`${medicine.medicine_name} added to cart!`)
+    }, 500)
+  }
+
     if (isPerMedicineLoading|| !medicine.unit_prices || medicine.unit_prices.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
@@ -248,9 +279,20 @@ const formatText = (text?: string) => {
 
               {/* Action Buttons */}
               <div className="space-y-2">
-                <Button className="w-full" size="lg" disabled={!medicine?.is_available}>
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  Add to Cart
+                <Button className="w-full" size="lg" disabled={!medicine?.is_available ||
+                  isAddingToCart
+                } onClick={handleAddToCart}>
+                  {isAddingToCart ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Adding to Cart...
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart className="h-4 w-4 mr-2" />
+                      Add to Cart
+                    </>
+                  )}
                 </Button>
                 {medicine?.rx_required && (
                   <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">

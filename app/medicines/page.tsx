@@ -46,7 +46,7 @@ export default function MedicinesPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { medicineinfo: Medicines = [], isMedicineLoading } = useMedicines()
-
+  
   const [searchTerm, setSearchTerm] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
   const [currentPage, setCurrentPage] = useState(1)
