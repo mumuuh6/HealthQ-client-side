@@ -13,9 +13,7 @@ import { Calendar, Clock, UserCheck, UserX, ChevronRight, Users } from "lucide-r
 import { useSession } from "next-auth/react"
 import UseAxiosNormal from "@/app/hook/UseAxiosNormal"
 import { useQuery } from "@tanstack/react-query"
-import { useRouter } from "next/navigation"
 import { ConsultationModal } from "@/app/consultation-modal"
-
 
 // Mock data for queue and appointments
 const queuePatients = [
@@ -60,8 +58,8 @@ const suggestedTopics = [
   "Chief Complaint",
   "History of Patient Illness",
   "Follow-up Instruction",
-  "Next Appointment"
-];
+  "Next Appointment",
+]
 const todayAppointments = [
   {
     id: 1,
@@ -124,62 +122,73 @@ const upcomingAppointments = [
   },
 ]
 type Appointment = {
-  id: string;
-  patient: string;
-  time: string;
-  type: string;
-  meetlink: string;
-  status: "checked_in" | "waiting" | "scheduled" | "confirmed";
-  date: Date; // Important: backend should send date as Date
-  duration?: string;
-};
+  id: string
+  patient: string
+  time: string
+  type: string
+  meetlink: string
+  status: "checked_in" | "waiting" | "scheduled" | "confirmed"
+  date: Date // Important: backend should send date as Date
+  duration?: string
+}
+
+type TranscriptData = {
+  allergies: string
+  bp: string
+  chief_complaint: string
+  followup_instruction: string
+  history_of_patient_illness: string
+  next_appointment: string
+  pulse: string
+  temperature: string
+}
+
 export default function DoctorDashboard() {
   const [activeTab, setActiveTab] = useState("today")
-   const [isConsultationModal, setIsConsultationModal] = useState(false);
-  const [currentPatients, setCurrentPatient] = useState<typeof queuePatients[0] | null>(queuePatients[0])
+  const [isConsultationModal, setIsConsultationModal] = useState(false)
+  const [currentPatients, setCurrentPatient] = useState<(typeof queuePatients)[0] | null>(queuePatients[0])
   const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false)
-  const [recording, setRecording] = useState(false);
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
-  const [account, setaccount] = useState<Appointment | null>(null);
-  const [recordingAppointmentId, setRecordingAppointmentId] = useState<string | null>(null);
-  //const [currentPatient, setCurrentPatient] = useState(queuePatients[0])
+  const [recording, setRecording] = useState(false)
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
+  const [account, setaccount] = useState<Appointment | null>(null)
+  const [recordingAppointmentId, setRecordingAppointmentId] = useState<string | null>(null)
+  const [transcriptData, setTranscriptData] = useState<TranscriptData | null>(null)
+  const [currentAppointmentForModal, setCurrentAppointmentForModal] = useState<Appointment | null>(null)
 
-  const { data: session } = useSession();
-  const axiossecure = UseAxiosNormal();
+  const { data: session } = useSession()
+  const axiossecure = UseAxiosNormal()
   const { data: appointments = [], isLoading } = useQuery({
     queryKey: ["doctorAppointments", session?.user?.email],
     queryFn: async () => {
-      if (!session?.user?.email) return [];
-      const res = await axiossecure.get(`/schedule/${session.user.email}`);
+      if (!session?.user?.email) return []
+      const res = await axiossecure.get(`/schedule/${session.user.email}`)
       // Convert date strings to Date objects
       return res.data.data.map((appt: Appointment) => ({
         ...appt,
         date: new Date(appt.date),
-      }));
+      }))
     },
     enabled: !!session?.user?.email,
-  });
+  })
   const { data: currentPatient = [], isLoading: currentLoading } = useQuery({
     queryKey: ["currentAppointments", session?.user?.email],
     queryFn: async () => {
-      if (!session?.user?.email) return [];
-      const res = await axiossecure.get(`/current-patient/${session.user.email}`);
+      if (!session?.user?.email) return []
+      const res = await axiossecure.get(`/current-patient/${session.user.email}`)
       //console.log('currentPatientData',res.data)
-      return res?.data?.data || null;
+      return res?.data?.data || null
     },
     enabled: !!session?.user?.email,
-  });
+  })
   const { data: normalPatient = [], isLoading: normalLoading } = useQuery({
     queryKey: ["normalAppointments"],
     queryFn: async () => {
-
-      const res = await axiossecure.get(`/findpatient/${currentPatient.id}`);
-      console.log('currentPatientData', res.data)
-      return res?.data || null;
+      const res = await axiossecure.get(`/findpatient/${currentPatient.id}`)
+      console.log("currentPatientData", res.data)
+      return res?.data || null
     },
     enabled: !!currentPatient?.id,
-  });
-
+  })
 
   //console.log('currentPatient',currentPatient)
   //  const handleNextPatient = () => {
@@ -233,75 +242,87 @@ export default function DoctorDashboard() {
       confirmButtonColor: "var(--primary)",
     })
   }
-  const today = new Date();
+  const today = new Date()
   const todayAppointments = appointments.filter((appt: Appointment) => {
     return (
       appt.date.getDate() === today.getDate() &&
       appt.date.getMonth() === today.getMonth() &&
       appt.date.getFullYear() === today.getFullYear()
-    );
-  });
+    )
+  })
 
   const upcomingAppointments = appointments.filter((appt: Appointment) => {
-    const apptDate = appt.date;
-    return apptDate > today;
-  });
+    const apptDate = appt.date
+    return apptDate > today
+  })
   const handleJoinConsultation = (meet: string) => {
     if (meet) {
-      window.open(meet, '_blank')
+      window.open(meet, "_blank")
     }
-
   }
   const startRecording = async (appointment: Appointment) => {
     //setaccount(appointment)
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
     //setIsConsultationModal(true);
-    const mediaRecorder = new MediaRecorder(stream);
-    const chunks: Blob[] = [];
+    const mediaRecorder = new MediaRecorder(stream)
+    const chunks: Blob[] = []
     setRecordingAppointmentId(appointment.id)
 
-    mediaRecorder.ondataavailable = e => chunks.push(e.data);
+    mediaRecorder.ondataavailable = (e) => chunks.push(e.data)
     mediaRecorder.onstop = () => {
-      const blob = new Blob(chunks, { type: 'audio/webm' });
-      setAudioBlob(blob);
-      setRecording(false);
-    };
-    mediaRecorder.start();
-    setRecording(true);
-    setTimeout(() => {
-      mediaRecorder.stop()
-    }, 2*60 * 1000);
+      const blob = new Blob(chunks, { type: "audio/webm" })
+      setAudioBlob(blob)
+      setRecording(false)
+    }
+    mediaRecorder.start()
+    setRecording(true)
+    setTimeout(
+      () => {
+        mediaRecorder.stop()
+      },
+      20 * 1000,
+    )
   }
+
   const uploadTranscript = async () => {
-    if (!audioBlob || !recordingAppointmentId) return Swal.fire('Error', 'No recording available', 'error');
-    const formData = new FormData();
+    if (!audioBlob || !recordingAppointmentId) return Swal.fire("Error", "No recording available", "error")
+    const formData = new FormData()
     formData.append(
       "audio",
       audioBlob,
-      `${recordingAppointmentId}-${Date.now()}-consultation.webm` // 🔑 tie filename to booking
-    );
-
+      `${recordingAppointmentId}-${Date.now()}-consultation.webm`, // 🔑 tie filename to booking
+    )
 
     try {
-      const res = await axiossecure.post(
-        `/upload-audio/${recordingAppointmentId}`,
-        formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
-      );
-      Swal.fire('Success', 'Transcript saved', 'success');
-      console.log(res.data);
+      const res = await axiossecure.post(`/upload-audio/${recordingAppointmentId}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+
+      // Show success message
+      //Swal.fire("Success", "Transcript saved", "success")
+      console.log(res.data)
+
+      // Set transcript data and find the current appointment
+      if (res.data.structuredData) {
+        setTranscriptData(res.data.structuredData)
+        const currentAppointment = appointments.find((appt: Appointment) => appt.id === recordingAppointmentId)
+        if (currentAppointment) {
+          setCurrentAppointmentForModal(currentAppointment)
+          // Open consultation modal with transcript data
+          setIsConsultationModal(true)
+        }
+      }
     } catch (err) {
-      console.error(err);
-      Swal.fire('Error', 'Failed to upload transcript', 'error');
+      console.error(err)
+      Swal.fire("Error", "Failed to upload transcript", "error")
     }
-  };
+  }
 
   if (currentLoading || isLoading) {
     return <div>Loading...</div>
   }
   return (
     <div className="flex min-h-screen flex-col">
-
       <main className="flex-1 p-4 md:p-6 bg-muted/40">
         <div className="mx-auto max-w-6xl space-y-6">
           <div>
@@ -331,7 +352,7 @@ export default function DoctorDashboard() {
                         <Avatar className="h-16 w-16">
                           <AvatarImage src="https://images.app.goo.gl/3wWrAmJDAEVYkPZy9" alt={currentPatient.name} />
                           <AvatarFallback>
-                            {(currentPatient?.name ?? '')
+                            {(currentPatient?.name ?? "")
                               .split(" ")
                               .map((n: string) => n[0])
                               .join("")}
@@ -363,7 +384,7 @@ export default function DoctorDashboard() {
                           <UserCheck className="mr-2 h-4 w-4" />
                           Complete & Next
                         </Button>
-                        <Button variant="outline" className="flex-1">
+                        <Button variant="outline" className="flex-1 bg-transparent">
                           <UserX className="mr-2 h-4 w-4" />
                           No Show
                         </Button>
@@ -477,9 +498,7 @@ export default function DoctorDashboard() {
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm ">
-                          Total: {todayAppointments.length} appointments
-                        </span>
+                        <span className="text-sm ">Total: {todayAppointments.length} appointments</span>
                       </div>
                     </div>
 
@@ -514,17 +533,14 @@ export default function DoctorDashboard() {
                             </Badge>
 
                             <Button
-                              size='sm'
+                              size="sm"
                               variant="outline"
                               onClick={() => handleJoinConsultation(appointment.meetlink)}
                             >
                               Join Consultation
                             </Button>
                             {audioBlob && recordingAppointmentId === appointment.id && (
-                              <Button
-                                className="bg-purple-500 text-white px-4 py-2 rounded"
-                                onClick={uploadTranscript}
-                              >
+                              <Button className="bg-purple-500 text-white px-4 py-2 rounded" onClick={uploadTranscript}>
                                 Upload Transcript
                               </Button>
                             )}
@@ -580,32 +596,27 @@ export default function DoctorDashboard() {
           </motion.div>
         </div>
       </main>
-      
+
+      {/* Regular consultation modal */}
       <ConsultationModal
         isOpen={isConsultationModalOpen}
         onClose={() => setIsConsultationModalOpen(false)}
         patient={normalPatient}
         onComplete={handleConsultationComplete}
       />
-      {/* <ConsultationModal
+
+      {/* Consultation modal with transcript data */}
+      <ConsultationModal
         isOpen={isConsultationModal}
-        onClose={() => setIsConsultationModal(false)}
-        patient={account}
+        onClose={() => {
+          setIsConsultationModal(false)
+          setTranscriptData(null)
+          setCurrentAppointmentForModal(null)
+        }}
+        patient={currentAppointmentForModal}
         onComplete={handleConsultationComplete}
-      /> */}
-
-
-
-      {/* {audioBlob && (
-        <button
-          className="bg-purple-500 text-white px-4 py-2 rounded"
-          onClick={uploadTranscript}
-        >
-          Upload Transcript
-        </button>
-      )} */}
+        transcriptData={transcriptData}
+      />
     </div>
-
   )
-
 }
