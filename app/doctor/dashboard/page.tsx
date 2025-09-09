@@ -280,7 +280,7 @@ export default function DoctorDashboard() {
       () => {
         mediaRecorder.stop()
       },
-      20 * 1000,
+      60 * 1000,
     )
   }
 
