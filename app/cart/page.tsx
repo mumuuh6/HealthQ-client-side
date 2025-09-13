@@ -54,15 +54,15 @@ export default function CartPage() {
     catch(err){
       console.log(err); 
     }
-    // setIsProcessing(true)
+    setIsProcessing(true)
 
     // Simulate payment processing
-    // await new Promise((resolve) => setTimeout(resolve, 2000))
+     await new Promise((resolve) => setTimeout(resolve, 2000))
 
     // Clear cart after successful purchase
-    // dispatch({ type: "CLEAR_CART" })
+     dispatch({ type: "CLEAR_CART" })
 
-    // setIsProcessing(false)
+     setIsProcessing(false)
 
     // Show success message and redirect
 

@@ -16,117 +16,121 @@ import { useQuery } from "@tanstack/react-query"
 import { ConsultationModal } from "@/app/consultation-modal"
 
 // Mock data for queue and appointments
-const queuePatients = [
-  {
-    id: 1,
-    name: "John Smith",
-    appointmentTime: "10:00 AM",
-    waitTime: "5 minutes",
-    status: "waiting",
-    position: 1,
-  },
-  {
-    id: 2,
-    name: "Emily Johnson",
-    appointmentTime: "10:15 AM",
-    waitTime: "20 minutes",
-    status: "waiting",
-    position: 2,
-  },
-  {
-    id: 3,
-    name: "Michael Brown",
-    appointmentTime: "10:30 AM",
-    waitTime: "35 minutes",
-    status: "waiting",
-    position: 3,
-  },
-  {
-    id: 4,
-    name: "Sarah Davis",
-    appointmentTime: "10:45 AM",
-    waitTime: "50 minutes",
-    status: "not_arrived",
-    position: 4,
-  },
-]
-const suggestedTopics = [
-  "BP",
-  "Pulse",
-  "Temperature",
-  "Allergies",
-  "Chief Complaint",
-  "History of Patient Illness",
-  "Follow-up Instruction",
-  "Next Appointment",
-]
-const todayAppointments = [
-  {
-    id: 1,
-    patient: "John Smith",
-    time: "10:00 AM",
-    type: "Follow-up",
-    status: "checked_in",
-  },
-  {
-    id: 2,
-    patient: "Emily Johnson",
-    time: "10:15 AM",
-    type: "Consultation",
-    status: "waiting",
-  },
-  {
-    id: 3,
-    patient: "Michael Brown",
-    time: "10:30 AM",
-    type: "Check-up",
-    status: "waiting",
-  },
-  {
-    id: 4,
-    patient: "Sarah Davis",
-    time: "10:45 AM",
-    type: "Consultation",
-    status: "scheduled",
-  },
-  {
-    id: 5,
-    patient: "Robert Wilson",
-    time: "11:00 AM",
-    type: "Follow-up",
-    status: "scheduled",
-  },
-]
+// const queuePatients = [
+//   {
+//     id: 1,
+//     name: "John Smith",
+//     appointmentTime: "10:00 AM",
+//     waitTime: "5 minutes",
+//     status: "waiting",
+//     position: 1,
+//   },
+//   {
+//     id: 2,
+//     name: "Emily Johnson",
+//     appointmentTime: "10:15 AM",
+//     waitTime: "20 minutes",
+//     status: "waiting",
+//     position: 2,
+//   },
+//   {
+//     id: 3,
+//     name: "Michael Brown",
+//     appointmentTime: "10:30 AM",
+//     waitTime: "35 minutes",
+//     status: "waiting",
+//     position: 3,
+//   },
+//   {
+//     id: 4,
+//     name: "Sarah Davis",
+//     appointmentTime: "10:45 AM",
+//     waitTime: "50 minutes",
+//     status: "not_arrived",
+//     position: 4,
+//   },
+// ]
+// const suggestedTopics = [
+//   "BP",
+//   "Pulse",
+//   "Temperature",
+//   "Allergies",
+//   "Chief Complaint",
+//   "History of Patient Illness",
+//   "Follow-up Instruction",
+//   "Next Appointment",
+// ]
+// const todayAppointments = [
+//   {
+//     id: 1,
+//     patient: "John Smith",
+//     time: "10:00 AM",
+//     type: "Follow-up",
+//     status: "checked_in",
+//   },
+//   {
+//     id: 2,
+//     patient: "Emily Johnson",
+//     time: "10:15 AM",
+//     type: "Consultation",
+//     status: "waiting",
+//   },
+//   {
+//     id: 3,
+//     patient: "Michael Brown",
+//     time: "10:30 AM",
+//     type: "Check-up",
+//     status: "waiting",
+//   },
+//   {
+//     id: 4,
+//     patient: "Sarah Davis",
+//     time: "10:45 AM",
+//     type: "Consultation",
+//     status: "scheduled",
+//   },
+//   {
+//     id: 5,
+//     patient: "Robert Wilson",
+//     time: "11:00 AM",
+//     type: "Follow-up",
+//     status: "scheduled",
+//   },
+// ]
 
-const upcomingAppointments = [
-  {
-    id: 6,
-    patient: "Jennifer Lee",
-    date: "Tomorrow",
-    time: "9:00 AM",
-    type: "New Patient",
-  },
-  {
-    id: 7,
-    patient: "David Martinez",
-    date: "Tomorrow",
-    time: "11:30 AM",
-    type: "Follow-up",
-  },
-  {
-    id: 8,
-    patient: "Lisa Taylor",
-    date: "Apr 16, 2025",
-    time: "2:15 PM",
-    type: "Consultation",
-  },
-]
+// const upcomingAppointments = [
+//   {
+//     id: 6,
+//     patient: "Jennifer Lee",
+//     date: "Tomorrow",
+//     time: "9:00 AM",
+//     type: "New Patient",
+//   },
+//   {
+//     id: 7,
+//     patient: "David Martinez",
+//     date: "Tomorrow",
+//     time: "11:30 AM",
+//     type: "Follow-up",
+//   },
+//   {
+//     id: 8,
+//     patient: "Lisa Taylor",
+//     date: "Apr 16, 2025",
+//     time: "2:15 PM",
+//     type: "Consultation",
+//   },
+// ]
 type Appointment = {
   id: string
   patient: string
+  name?: string
   time: string
+  appointmentTime?: string
   type: string
   meetlink: string
+  waitTime?: string
+  queuePosition?: number
   status: "checked_in" | "waiting" | "scheduled" | "confirmed"
   date: Date // Important: backend should send date as Date
   duration?: string
@@ -147,11 +151,11 @@ export default function DoctorDashboard() {
   const [activeTab, setActiveTab] = useState("today")
   const [isConsultationModal, setIsConsultationModal] = useState(false)
   const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false)
-  const [currentPatients, setCurrentPatient] = useState<(typeof queuePatients)[0] | null>(queuePatients[0])
-  
+  // const [currentPatients, setCurrentPatient] = useState<(typeof queuePatients)[0] | null>(queuePatients[0])
+    const [queuePatients, setQueuePatients] = useState<Appointment[]>([])
+
   const [recording, setRecording] = useState(false)
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
-  const [account, setaccount] = useState<Appointment | null>(null)
   const [recordingAppointmentId, setRecordingAppointmentId] = useState<string | null>(null)
   const [transcriptData, setTranscriptData] = useState<TranscriptData | null>(null)
   const [currentAppointmentForModal, setCurrentAppointmentForModal] = useState<Appointment | null>(null)
@@ -172,7 +176,7 @@ export default function DoctorDashboard() {
     },
     enabled: !!session?.user?.email,
   })
-  const { data: currentPatient = [], isLoading: currentLoading } = useQuery({
+  const { data: currentPatient = [], isLoading: currentLoading ,refetch} = useQuery({
     queryKey: ["currentAppointments", session?.user?.email],
     queryFn: async () => {
       if (!session?.user?.email) return []
@@ -182,6 +186,10 @@ export default function DoctorDashboard() {
     },
     enabled: !!session?.user?.email,
   })
+  const currentPatientt=currentPatient?.currentPatient ||null;
+  const queuePatientss=currentPatient?.queue ||null;
+  console.log("currentPatient", currentPatient)
+  console.log("queuePatients", queuePatients)
   const { data: normalPatient = [], isLoading: normalLoading } = useQuery({
     queryKey: ["normalAppointments"],
     queryFn: async () => {
@@ -192,25 +200,24 @@ export default function DoctorDashboard() {
     enabled: !!currentPatient?.id,
   })
 
-  //console.log('currentPatient',currentPatient)
-  //  const handleNextPatient = () => {
-  //     Swal.fire({
-  //       title: "Complete current appointment?",
-  //       text: "This will take you to the consultation page to document the visit",
-  //       icon: "question",
-  //       showCancelButton: true,
-  //       confirmButtonColor: "hsl(var(--primary))",
-  //       cancelButtonColor: "hsl(var(--muted))",
-  //       confirmButtonText: "Yes, complete consultation",
-  //     }).then((result) => {
-  //       if (result.isConfirmed) {
-  //         // Navigate to consultation page
-  //         router.push(`/doctor/consultation/${currentPatient.id}`)
-  //       }
-  //     })
-  //   }
 
-  const handleNextPatient = () => {
+
+  const handleNextPatient = (patientId:string) => {
+    
+    // Swal.fire({
+    //   title: "Complete current appointment?",
+    //   text: "This will open the consultation form to document the visit",
+    //   icon: "question",
+    //   showCancelButton: true,
+    //   confirmButtonColor: "var(--primary)",
+    //   cancelButtonColor: "var(--muted)",
+    //   confirmButtonText: "Yes, complete consultation",
+    // }).then((result) => {
+    //   if (result.isConfirmed) {
+    //     setIsConsultationModalOpen(true)
+    //   }
+    // })
+  if (!currentPatient) return
     Swal.fire({
       title: "Complete current appointment?",
       text: "This will open the consultation form to document the visit",
@@ -219,23 +226,26 @@ export default function DoctorDashboard() {
       confirmButtonColor: "var(--primary)",
       cancelButtonColor: "var(--muted)",
       confirmButtonText: "Yes, complete consultation",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        setIsConsultationModalOpen(true)
+        // Mark patient as completed in backend
+        await axiossecure.post(`/queue/complete/${patientId}`)
+        refetch() // refresh queue and current patient
+        //setIsConsultationModalOpen(true)
       }
     })
   }
 
   const handleConsultationComplete = (data: any) => {
-    console.log("Consultation completed:", data)
+    // console.log("Consultation completed:", data)
 
-    // Move to next patient
-    const nextPatientIndex = queuePatients.findIndex((p) => p.id === currentPatients?.id) + 1
-    if (nextPatientIndex < queuePatients.length) {
-      setCurrentPatient(queuePatients[nextPatientIndex])
-    } else {
-      setCurrentPatient(null)
-    }
+    // // Move to next patient
+    // const nextPatientIndex = queuePatients.findIndex((p) => p.id === currentPatients?.id) + 1
+    // if (nextPatientIndex < queuePatients.length) {
+    //   setCurrentPatient(queuePatients[nextPatientIndex])
+    // } else {
+    //   setCurrentPatient(null)
+    // }
 
     Swal.fire({
       title: "Consultation Completed!",
@@ -244,6 +254,7 @@ export default function DoctorDashboard() {
       confirmButtonColor: "var(--primary)",
     })
   }
+
   const today = new Date()
   const todayAppointments = appointments.filter((appt: Appointment) => {
     return (
@@ -355,41 +366,41 @@ export default function DoctorDashboard() {
                   <CardDescription>Now serving</CardDescription>
                 </CardHeader>
                 <CardContent className="p-6">
-                  {currentPatient ? (
+                  {currentPatientt ? (
                     <div className="space-y-6">
                       <div className="flex items-center gap-4">
                         <Avatar className="h-16 w-16">
-                          <AvatarImage src="https://images.app.goo.gl/3wWrAmJDAEVYkPZy9" alt={currentPatient.name} />
+                          <AvatarImage src="https://images.app.goo.gl/3wWrAmJDAEVYkPZy9" alt={currentPatientt.name} />
                           <AvatarFallback>
-                            {(currentPatient?.name ?? "")
+                            {(currentPatientt?.name ?? "")
                               .split(" ")
                               .map((n: string) => n[0])
                               .join("")}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <h3 className="text-xl font-medium">{currentPatient.name}</h3>
-                          <p className="text-sm ">Appointment: {currentPatient.appointmentTime}</p>
+                          <h3 className="text-xl font-medium">{currentPatientt.patient}</h3>
+                          <p className="text-sm ">Appointment: {currentPatientt.appointmentTime}</p>
                         </div>
                       </div>
 
                       <div className="space-y-4">
                         <div className="flex justify-between text-sm">
                           <span>Appointment Type:</span>
-                          <span className="font-medium">{currentPatient.appointmentType}</span>
+                          <span className="font-medium">{currentPatientt.appointmentType}</span>
                         </div>
                         <div className="flex justify-between text-sm">
                           <span>Patient ID:</span>
-                          <span className="font-medium">P-{currentPatient.id}</span>
+                          <span className="font-medium">P-{currentPatientt.id}</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span>Time in consultation:</span>
-                          <span className="font-medium">12 minutes</span>
+                          <span>Patient Name:</span>
+                          <span className="font-medium">{currentPatientt?.name}</span>
                         </div>
                       </div>
 
                       <div className="flex gap-2">
-                        <Button onClick={handleNextPatient} className="flex-1">
+                        <Button onClick={()=>handleNextPatient(currentPatientt.id)} className="flex-1">
                           <UserCheck className="mr-2 h-4 w-4" />
                           Complete & Next
                         </Button>
@@ -431,7 +442,7 @@ export default function DoctorDashboard() {
                         <div className="rounded-full bg-primary/10 p-2">
                           <Users className="h-4 w-4 text-primary" />
                         </div>
-                        <span className="font-medium">Patients in queue: {queuePatients.length}</span>
+                        <span className="font-medium">Patients in queue: {queuePatientss?.length}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-sm ">Average wait time: 25 minutes</span>
@@ -439,11 +450,11 @@ export default function DoctorDashboard() {
                     </div>
 
                     <div className="space-y-2">
-                      {queuePatients.map((patient, index) => (
+                      {queuePatientss?.map((patient:Appointment, index:number) => (
                         <div key={patient.id} className="flex items-center justify-between p-3 rounded-lg border">
                           <div className="flex items-center gap-3">
                             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-medium text-primary">
-                              {patient.position}
+                              {patient.queuePosition}
                             </div>
                             <div>
                               <p className="font-medium">{patient.name}</p>
