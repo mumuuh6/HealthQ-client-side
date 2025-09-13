@@ -146,14 +146,16 @@ type TranscriptData = {
 export default function DoctorDashboard() {
   const [activeTab, setActiveTab] = useState("today")
   const [isConsultationModal, setIsConsultationModal] = useState(false)
-  const [currentPatients, setCurrentPatient] = useState<(typeof queuePatients)[0] | null>(queuePatients[0])
   const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false)
+  const [currentPatients, setCurrentPatient] = useState<(typeof queuePatients)[0] | null>(queuePatients[0])
+  
   const [recording, setRecording] = useState(false)
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
   const [account, setaccount] = useState<Appointment | null>(null)
   const [recordingAppointmentId, setRecordingAppointmentId] = useState<string | null>(null)
   const [transcriptData, setTranscriptData] = useState<TranscriptData | null>(null)
   const [currentAppointmentForModal, setCurrentAppointmentForModal] = useState<Appointment | null>(null)
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
 
   const { data: session } = useSession()
   const axiossecure = UseAxiosNormal()
@@ -275,15 +277,22 @@ export default function DoctorDashboard() {
       setRecording(false)
     }
     mediaRecorder.start()
+    setMediaRecorder(mediaRecorder)
     setRecording(true)
-    setTimeout(
-      () => {
-        mediaRecorder.stop()
-      },
-      30 * 1000,
-    )
+    setRecordingAppointmentId(appointment.id)
+    // setTimeout(
+    //   () => {
+    //     mediaRecorder.stop()
+    //   },
+    //   60 * 1000,
+    // )
   }
-
+    const stopRecording = () => {
+    if (mediaRecorder) {
+      mediaRecorder.stop()
+      setMediaRecorder(null)
+    }
+  }
   const uploadTranscript = async () => {
     if (!audioBlob || !recordingAppointmentId) return Swal.fire("Error", "No recording available", "error")
     const formData = new FormData()
@@ -545,14 +554,21 @@ export default function DoctorDashboard() {
                               </Button>
                             )}
 
-                            {!recording && (
-                              <Button
-                                className="bg-blue-500 text-white px-4 py-2 rounded"
-                                onClick={() => startRecording(appointment)}
-                              >
-                                Start Recording
-                              </Button>
-                            )}
+                            {!recording ? (
+                            <Button
+                              className="bg-blue-500 text-white px-4 py-2 rounded"
+                              onClick={() => startRecording(appointment)}
+                            >
+                              Start Recording
+                            </Button>
+                          ) : recordingAppointmentId === appointment.id ? (
+                            <Button
+                              className="bg-red-500 text-white px-4 py-2 rounded"
+                              onClick={stopRecording}
+                            >
+                              Stop Recording
+                            </Button>
+                          ) : null}
 
                             {recording && recordingAppointmentId === appointment.id && (
                               <span className="text-red-500">Recording...</span>
