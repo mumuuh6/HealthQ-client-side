@@ -334,7 +334,7 @@ export default function HomePage() {
                     <Brain className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <p className="font-semibold text-sm">AIi Screening</p>
+                    <p className="font-semibold text-sm">AI Screening</p>
                     <p className="text-primary font-bold">96% Accuracy</p>
                   </div>
                 </div>

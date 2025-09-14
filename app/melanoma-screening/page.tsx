@@ -39,11 +39,11 @@ export default function MelanomaScreeningPage() {
 
     setIsAnalyzing(true)
     try {
-      // In a real app, you would send the image to your backend for analysis
+      
       const formData = new FormData()
-      formData.append("image", selectedImage)
+      formData.append("file", selectedImage)
 
-      // Call the server action to analyze the image
+     
       const analysisResult = await analyzeSkinImage(formData)
       setResult(analysisResult)
     } catch (error) {
@@ -63,7 +63,7 @@ export default function MelanomaScreeningPage() {
   }
 
   return (
-    <div className="py-12 md:py-16 lg:py-20 bg-muted/40">
+    <div className="py-12 md:py-16 lg:py-8 bg-muted/40">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center text-center space-y-4 mb-8">
           <motion.h1
@@ -84,7 +84,7 @@ export default function MelanomaScreeningPage() {
           </motion.p>
         </div>
 
-        <Alert className="mb-8 max-w-3xl mx-auto">
+        <Alert className="mb-8 max-w-7xl mx-auto">
           <Info className="h-4 w-4" />
           <AlertTitle>Medical Disclaimer</AlertTitle>
           <AlertDescription>
@@ -94,7 +94,7 @@ export default function MelanomaScreeningPage() {
           </AlertDescription>
         </Alert>
 
-        <div className="grid gap-8 md:grid-cols-2 max-w-5xl mx-auto">
+        <div className="grid gap-8 md:grid-cols-2 max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -110,21 +110,21 @@ export default function MelanomaScreeningPage() {
               <CardContent className="space-y-4">
                 <div
                   className={cn(
-                    "border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center",
+                    "border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center relative",
                     previewUrl ? "border-primary" : "border-muted-foreground/25",
                   )}
                 >
                   {previewUrl ? (
                     <div className="relative w-full aspect-square max-w-xs mx-auto">
                       <Image
-                        src={previewUrl || "/placeholder.svg"}
+                        src={previewUrl || "No Image found"}
                         alt="Skin lesion preview"
                         fill
                         className="object-contain rounded-md"
                       />
                     </div>
                   ) : (
-                    <div className="py-8">
+                    <div className="py-8 pointer-events-none">
                       <Upload className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
                       <p className="text-sm text-muted-foreground mb-2">
                         Drag and drop your image here, or click to browse
@@ -132,16 +132,15 @@ export default function MelanomaScreeningPage() {
                       <p className="text-xs text-muted-foreground">Supported formats: JPG, PNG, HEIC</p>
                     </div>
                   )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className={cn(
-                      "absolute inset-0 w-full h-full opacity-0 cursor-pointer",
-                      previewUrl ? "pointer-events-none" : "",
-                    )}
-                    disabled={isAnalyzing}
-                  />
+                  {!previewUrl && (
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      disabled={isAnalyzing}
+                    />
+                  )}
                 </div>
 
                 {previewUrl && (
@@ -261,7 +260,7 @@ export default function MelanomaScreeningPage() {
           </motion.div>
         </div>
 
-        <div className="mt-12 max-w-3xl mx-auto">
+        <div className="mt-12 max-w-7xl mx-auto">
           <Tabs defaultValue="about">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="about">About Melanoma</TabsTrigger>
