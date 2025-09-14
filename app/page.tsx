@@ -280,7 +280,7 @@ export default function HomePage() {
                         <Brain className="w-5 h-5 text-emerald-500" />
                         <span className="text-sm font-medium">AI Screening</span>
                       </div>
-                      <p className="text-2xl font-bold text-emerald-500">99.2%</p>
+                      <p className="text-2xl font-bold text-emerald-500">96%</p>
                       <p className="text-xs text-muted-foreground">Accuracy Rate</p>
                     </div>
                     <div className="bg-gradient-to-r from-purple-500/10 to-indigo-500/10 rounded-xl p-4 border border-purple-500/20">
@@ -335,7 +335,7 @@ export default function HomePage() {
                   </div>
                   <div>
                     <p className="font-semibold text-sm">AIi Screening</p>
-                    <p className="text-primary font-bold">99.2% Accuracy</p>
+                    <p className="text-primary font-bold">96% Accuracy</p>
                   </div>
                 </div>
               </motion.div>
