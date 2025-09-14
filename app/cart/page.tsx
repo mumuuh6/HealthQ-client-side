@@ -72,7 +72,7 @@ export default function CartPage() {
 
   if (state.items.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container max-w-7xl mx-auto px-4 py-8">
         <div className="text-center py-16">
           <ShoppingCart className="h-24 w-24 mx-auto text-muted-foreground mb-4" />
           <h1 className="text-2xl font-bold mb-2">Your cart is empty</h1>
@@ -89,7 +89,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container max-w-7xl mx-auto px-4 py-8">
       <div className="flex items-center gap-2 mb-6">
         <Link href="/medicines">
           <Button variant="ghost" size="sm">

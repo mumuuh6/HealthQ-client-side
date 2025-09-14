@@ -108,7 +108,7 @@ export default function AboutPage() {
   return (
     <div className="max-w-7xl mx-auto min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative py-20 px-4 bg-gradient-to-br from-primary/10 via-background to-secondary/10">
+      <section className="max-w-7xl mx-auto relative py-10 px-4 bg-gradient-to-br from-primary/10 via-background to-secondary/10">
         <div className="container mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -133,7 +133,7 @@ export default function AboutPage() {
 
       {/* Stats Section */}
       <section className="py-16 px-4">
-        <div className="container mx-auto max-w-6xl">
+        <div className="container mx-auto max-w-7xl">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {stats.map((stat, index) => {
               const Icon = stat.icon
@@ -215,7 +215,7 @@ export default function AboutPage() {
 
       {/* Values Section */}
       <section className="py-16 px-4">
-        <div className="container mx-auto max-w-6xl">
+        <div className="container mx-auto max-w-7xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -315,7 +315,7 @@ export default function AboutPage() {
 
       {/* Timeline Section */}
       <section className="py-16 px-4">
-        <div className="container mx-auto max-w-4xl">
+        <div className="container mx-auto max-w-7xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -345,7 +345,7 @@ export default function AboutPage() {
                     {milestone.year}
                   </div>
                   <Card className="flex-1">
-                    <CardContent className="pt-4">
+                    <CardContent className="pt-4 flex  flex-col  items-center">
                       <h3 className="text-lg font-semibold mb-2">{milestone.title}</h3>
                       <p className="text-muted-foreground">{milestone.description}</p>
                     </CardContent>
@@ -391,15 +391,15 @@ export default function AboutPage() {
             <div className="grid md:grid-cols-3 gap-6 pt-8">
               <div className="flex items-center justify-center gap-3 text-muted-foreground">
                 <MapPin className="h-5 w-5 text-primary" />
-                <span>San Francisco, CA</span>
+                <span>Ashulia, Savar, Dhaka</span>
               </div>
               <div className="flex items-center justify-center gap-3 text-muted-foreground">
                 <Phone className="h-5 w-5 text-primary" />
-                <span>+1 (555) 123-4567</span>
+                <span>+8801963175097</span>
               </div>
               <div className="flex items-center justify-center gap-3 text-muted-foreground">
                 <Mail className="h-5 w-5 text-primary" />
-                <span>hello@healthq.com</span>
+                <span>healthq@gmail.com</span>
               </div>
             </div>
           </motion.div>

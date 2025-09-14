@@ -221,7 +221,7 @@ export default function HomePage() {
                 </Button> */}
               </motion.div>
 
-              <motion.div
+              {/* <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
@@ -247,7 +247,7 @@ export default function HomePage() {
                     Trusted by <span className="font-semibold text-foreground">10,000+</span> healthcare providers
                   </p>
                 </div>
-              </motion.div>
+              </motion.div> */}
             </motion.div>
 
             <motion.div
@@ -401,7 +401,7 @@ export default function HomePage() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-3 gap-8">
             {stats.map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -432,7 +432,7 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-gradient-to-br from-background to-card">
+      <section className="max-w-7xl mx-auto py-20 bg-gradient-to-br from-background to-card">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -489,7 +489,7 @@ export default function HomePage() {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 bg-gradient-to-r from-muted to-card">
+      <section className="max-w-7xl mx-auto py-20 bg-gradient-to-r from-muted to-card">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -568,7 +568,7 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-gradient-to-br from-background to-muted">
+      <section className="max-w-7xl mx-auto py-20 bg-gradient-to-br from-background to-muted">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -644,7 +644,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-primary via-accent to-primary text-primary-foreground relative overflow-hidden">
+      <section className="max-w-7xl mx-auto py-20 bg-gradient-to-r from-primary via-accent to-primary text-primary-foreground relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10" />
         <div className="container mx-auto px-4 text-center relative z-10">
           <motion.div
