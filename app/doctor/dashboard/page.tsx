@@ -265,7 +265,7 @@ export default function DoctorDashboard() {
                     <span className="text-red-700 font-medium">Recording in progress...</span>
                   </div>
                   <span className="text-sm text-red-600">
-                    Patient: {appointments.find((a) => a.id === recordingAppointmentId)?.patient}
+                    Patient: {appointments.find((a:Appointment) => a.id === recordingAppointmentId)?.patient}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
