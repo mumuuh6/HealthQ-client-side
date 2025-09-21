@@ -90,5 +90,3 @@ We welcome contributions!
 
 ## ⚡ Developed with ❤️ by **Mumu**  
 
-pip install -r requirements.txt
-```
